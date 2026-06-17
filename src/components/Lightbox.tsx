@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import type { Photo } from "@/lib/photos";
 
 const LENS_SIZE = 560;
+const LENS_SIZE_MOBILE = 260;
 const LENS_ZOOM = 2;
 
 interface LensState {
@@ -12,6 +13,7 @@ interface LensState {
   bgY: number;
   bgW: number;
   bgH: number;
+  size: number;
 }
 
 interface Props {
@@ -35,6 +37,7 @@ export function Lightbox({
   const [dragX, setDragX] = useState(0);
   const [magnifyActive, setMagnifyActive] = useState(false);
   const [lens, setLens] = useState<LensState | null>(null);
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
   const dragState = useRef<{
     active: boolean;
     startX: number;
@@ -61,36 +64,76 @@ export function Lightbox({
     setMagnifyActive(true);
     setDragX(0);
     dragState.current.active = false;
-  }, []);
 
-  const updateLens = useCallback((clientX: number, clientY: number) => {
     const img = imgRef.current;
     if (!img) return;
-
     const rect = img.getBoundingClientRect();
-    if (
-      clientX < rect.left ||
-      clientX > rect.right ||
-      clientY < rect.top ||
-      clientY > rect.bottom
-    ) {
-      setLens(null);
-      return;
-    }
-
-    const relX = clientX - rect.left;
-    const relY = clientY - rect.top;
-    const bgW = rect.width * LENS_ZOOM;
-    const bgH = rect.height * LENS_ZOOM;
-
+    const lensSize = window.matchMedia("(pointer: coarse)").matches
+      ? LENS_SIZE_MOBILE
+      : LENS_SIZE;
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const relX = cx - rect.left;
+    const relY = cy - rect.top;
     setLens({
-      x: clientX,
-      y: clientY,
-      bgX: -relX * LENS_ZOOM + LENS_SIZE / 2,
-      bgY: -relY * LENS_ZOOM + LENS_SIZE / 2,
-      bgW,
-      bgH,
+      x: cx,
+      y: cy,
+      bgX: -relX * LENS_ZOOM + lensSize / 2,
+      bgY: -relY * LENS_ZOOM + lensSize / 2,
+      bgW: rect.width * LENS_ZOOM,
+      bgH: rect.height * LENS_ZOOM,
+      size: lensSize,
     });
+  }, []);
+
+  const updateLens = useCallback(
+    (clientX: number, clientY: number, clamp = false) => {
+      const img = imgRef.current;
+      if (!img) return;
+
+      const rect = img.getBoundingClientRect();
+      const lensSize = window.matchMedia("(pointer: coarse)").matches
+        ? LENS_SIZE_MOBILE
+        : LENS_SIZE;
+
+      let x = clientX;
+      let y = clientY;
+
+      if (clamp) {
+        x = Math.min(rect.right, Math.max(rect.left, x));
+        y = Math.min(rect.bottom, Math.max(rect.top, y));
+      } else if (
+        clientX < rect.left ||
+        clientX > rect.right ||
+        clientY < rect.top ||
+        clientY > rect.bottom
+      ) {
+        setLens(null);
+        return;
+      }
+
+      const relX = x - rect.left;
+      const relY = y - rect.top;
+
+      setLens({
+        x,
+        y,
+        bgX: -relX * LENS_ZOOM + lensSize / 2,
+        bgY: -relY * LENS_ZOOM + lensSize / 2,
+        bgW: rect.width * LENS_ZOOM,
+        bgH: rect.height * LENS_ZOOM,
+        size: lensSize,
+      });
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)");
+    const sync = () => setIsCoarsePointer(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
   useEffect(() => {
@@ -107,9 +150,10 @@ export function Lightbox({
 
   useEffect(() => {
     if (!magnifyActive) return;
-    const onMove = (e: MouseEvent) => updateLens(e.clientX, e.clientY);
-    window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
+    const clamp = window.matchMedia("(pointer: coarse)").matches;
+    const onMove = (e: PointerEvent) => updateLens(e.clientX, e.clientY, clamp);
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
   }, [magnifyActive, updateLens]);
 
   // Body scroll lock
@@ -262,9 +306,22 @@ export function Lightbox({
     }
   };
 
+  const onMagnifyPointerMove = (e: React.PointerEvent) => {
+    if (!magnifyActive) return;
+    updateLens(e.clientX, e.clientY, isCoarsePointer);
+  };
+
+  const onMagnifyPointerDown = (e: React.PointerEvent) => {
+    if (!magnifyActive) return;
+    updateLens(e.clientX, e.clientY, isCoarsePointer);
+  };
+
   const handleSurfaceClick = () => {
-    if (magnifyActive) cancelMagnify();
-    else close();
+    if (magnifyActive) {
+      if (!isCoarsePointer) cancelMagnify();
+      return;
+    }
+    close();
   };
 
   return (
@@ -304,13 +361,20 @@ export function Lightbox({
             aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
             aria-pressed={magnifyActive}
             className={`interactive-target absolute bottom-full left-0 z-10 mb-2 transition-colors ${
-              magnifyActive ? "text-red-500 pointer-events-none" : "text-white/70 hover:text-white"
+              magnifyActive
+                ? "text-red-500 pointer-events-none"
+                : "text-white/70 hover:text-white"
             }`}
             data-cursor={magnifyActive ? undefined : "Magnify"}
           >
             <ZoomIn size={20} strokeWidth={1.5} />
           </button>
 
+          <div
+            className="relative touch-none"
+            onPointerDown={onMagnifyPointerDown}
+            onPointerMove={onMagnifyPointerMove}
+          >
           <img
             ref={imgRef}
             src={photo.src}
@@ -322,8 +386,9 @@ export function Lightbox({
             onLoad={handleImageLoad}
             onClick={(e) => {
               e.stopPropagation();
-              if (magnifyActive) cancelMagnify();
-              else close();
+              if (magnifyActive) {
+                if (!isCoarsePointer) cancelMagnify();
+              } else close();
             }}
             style={{
               transform: dragX ? `translateX(${dragX}px)` : undefined,
@@ -337,11 +402,27 @@ export function Lightbox({
 
           {magnifyActive && lens && (
             <div
-              aria-hidden
-              className="pointer-events-none fixed z-[1001] overflow-hidden rounded-full"
+              role={isCoarsePointer ? "button" : undefined}
+              tabIndex={isCoarsePointer ? 0 : undefined}
+              aria-label={isCoarsePointer ? "Close magnification" : undefined}
+              onClick={(e) => {
+                if (!isCoarsePointer) return;
+                e.stopPropagation();
+                cancelMagnify();
+              }}
+              onKeyDown={(e) => {
+                if (!isCoarsePointer) return;
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  cancelMagnify();
+                }
+              }}
+              className={`fixed z-[1001] overflow-hidden rounded-full ${
+                isCoarsePointer ? "pointer-events-auto touch-none" : "pointer-events-none"
+              }`}
               style={{
-                width: LENS_SIZE,
-                height: LENS_SIZE,
+                width: lens.size,
+                height: lens.size,
                 left: lens.x,
                 top: lens.y,
                 transform: "translate(-50%, -50%)",
@@ -352,6 +433,7 @@ export function Lightbox({
               }}
             />
           )}
+          </div>
         </div>
       </div>
 
@@ -369,8 +451,9 @@ export function Lightbox({
         type="button"
         onClick={(e) => {
           e.stopPropagation();
-          if (magnifyActive) cancelMagnify();
-          else close();
+          if (magnifyActive) {
+            if (!isCoarsePointer) cancelMagnify();
+          } else close();
         }}
         aria-label="Close"
         className="absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] end-4 sm:end-5 z-20 interactive-target inline-flex items-center justify-center text-white/80 hover:text-white transition-colors"
