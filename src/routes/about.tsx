@@ -41,8 +41,8 @@ function AboutPage() {
         <div className="md:col-span-7">
           <p className="nav-label opacity-60 mb-5 sm:mb-6">About</p>
           <h1 className="font-display page-title max-w-3xl">
-            I photograph people, cities, and the moments between them - wherever
-            the road goes.
+            I photograph people, cities, and the moments between them -
+            whatever life presents in front of me.
           </h1>
 
           <div className="mt-8 sm:mt-10 grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 max-w-3xl text-[15px] sm:text-base md:text-[17px] leading-relaxed text-muted-foreground">

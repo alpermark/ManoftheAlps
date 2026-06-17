@@ -57,6 +57,8 @@ function GalleryPage() {
           the Alps
         </h1>
         <p className="mt-6 sm:mt-8 md:mt-10 max-w-xl nav-label text-muted-foreground leading-relaxed">
+          Mark Alper.
+          <br />
           Photographs from cities, roads, nature, and the strangers that breath
           between them. If only for an instant.
         </p>
