@@ -44,10 +44,10 @@ var p07_thumb_default$7 = "/assets/p07.thumb-BGEN-dOg.webp";
 var p07_default$7 = "/assets/p07-Dwu-pBC7.webp";
 //#endregion
 //#region src/assets/batch01/p08.thumb.webp?url
-var p08_thumb_default$7 = "/assets/p08.thumb-B9bKZXOw.webp";
+var p08_thumb_default$6 = "/assets/p08.thumb-B9bKZXOw.webp";
 //#endregion
 //#region src/assets/batch01/p08.webp?url
-var p08_default$7 = "/assets/p08-DgILaMPx.webp";
+var p08_default$6 = "/assets/p08-DgILaMPx.webp";
 //#endregion
 //#region src/assets/batch01/p09.thumb.webp?url
 var p09_thumb_default$7 = "/assets/p09.thumb-DJ8hgSjQ.webp";
@@ -260,10 +260,10 @@ var p07_thumb_default$6 = "/assets/p07.thumb-D8iOsp1i.webp";
 var p07_default$6 = "/assets/p07-BivhMDQs.webp";
 //#endregion
 //#region src/assets/batch02/p08.thumb.webp?url
-var p08_thumb_default$6 = "/assets/p08.thumb-Bvfumk-X.webp";
+var p08_thumb_default$5 = "/assets/p08.thumb-Bvfumk-X.webp";
 //#endregion
 //#region src/assets/batch02/p08.webp?url
-var p08_default$6 = "/assets/p08-j92iYBKe.webp";
+var p08_default$5 = "/assets/p08-j92iYBKe.webp";
 //#endregion
 //#region src/assets/batch02/p09.thumb.webp?url
 var p09_thumb_default$6 = "/assets/p09.thumb--8Q39GH9.webp";
@@ -494,10 +494,10 @@ var p07_thumb_default$5 = "/assets/p07.thumb-Bkj7JTcd.webp";
 var p07_default$5 = "/assets/p07-DNx7RKvv.webp";
 //#endregion
 //#region src/assets/batch03/p08.thumb.webp?url
-var p08_thumb_default$5 = "/assets/p08.thumb-C-zTo8bF.webp";
+var p08_thumb_default$4 = "/assets/p08.thumb-C-zTo8bF.webp";
 //#endregion
 //#region src/assets/batch03/p08.webp?url
-var p08_default$5 = "/assets/p08-Cz-8XjR5.webp";
+var p08_default$4 = "/assets/p08-Cz-8XjR5.webp";
 //#endregion
 //#region src/assets/batch03/p09.thumb.webp?url
 var p09_thumb_default$5 = "/assets/p09.thumb-PW84CP3m.webp";
@@ -780,12 +780,6 @@ var p07_thumb_default$4 = "/assets/p07.thumb-CauS7eev.webp";
 //#endregion
 //#region src/assets/batch04/p07.webp?url
 var p07_default$4 = "/assets/p07-BAH7qUdN.webp";
-//#endregion
-//#region src/assets/batch04/p08.thumb.webp?url
-var p08_thumb_default$4 = "/assets/p08.thumb-Bgq64DC-.webp";
-//#endregion
-//#region src/assets/batch04/p08.webp?url
-var p08_default$4 = "/assets/p08-BePd6Ce-.webp";
 //#endregion
 //#region src/assets/batch04/p09.thumb.webp?url
 var p09_thumb_default$4 = "/assets/p09.thumb-E4MyfGd8.webp";
@@ -2755,7 +2749,6 @@ var meta_default$5 = {
 	"p05.webp": { "title": "Cabaret Color Burst" },
 	"p06.webp": { "title": "Twig Tangle Shore" },
 	"p07.webp": { "title": "Glass-Framed Tower" },
-	"p08.webp": { "title": "Skyline Kiss Silhouette" },
 	"p09.webp": { "title": "Emerald Lake Bowl" },
 	"p10.webp": { "title": "Grinning Clown Portal" },
 	"p11.webp": { "title": "Fog-Swallowed Avenue" },
@@ -3210,8 +3203,8 @@ var fullModules = /* #__PURE__ */ Object.assign({
 	"../assets/batch01/p06.webp": p06_default$6,
 	"../assets/batch01/p07.thumb.webp": p07_thumb_default$7,
 	"../assets/batch01/p07.webp": p07_default$7,
-	"../assets/batch01/p08.thumb.webp": p08_thumb_default$7,
-	"../assets/batch01/p08.webp": p08_default$7,
+	"../assets/batch01/p08.thumb.webp": p08_thumb_default$6,
+	"../assets/batch01/p08.webp": p08_default$6,
 	"../assets/batch01/p09.thumb.webp": p09_thumb_default$7,
 	"../assets/batch01/p09.webp": p09_default$7,
 	"../assets/batch01/p10.thumb.webp": p10_thumb_default$7,
@@ -3282,8 +3275,8 @@ var fullModules = /* #__PURE__ */ Object.assign({
 	"../assets/batch02/p06.webp": p06_default$5,
 	"../assets/batch02/p07.thumb.webp": p07_thumb_default$6,
 	"../assets/batch02/p07.webp": p07_default$6,
-	"../assets/batch02/p08.thumb.webp": p08_thumb_default$6,
-	"../assets/batch02/p08.webp": p08_default$6,
+	"../assets/batch02/p08.thumb.webp": p08_thumb_default$5,
+	"../assets/batch02/p08.webp": p08_default$5,
 	"../assets/batch02/p09.thumb.webp": p09_thumb_default$6,
 	"../assets/batch02/p09.webp": p09_default$6,
 	"../assets/batch02/p10.thumb.webp": p10_thumb_default$6,
@@ -3360,8 +3353,8 @@ var fullModules = /* #__PURE__ */ Object.assign({
 	"../assets/batch03/p06.webp": p06_default$4,
 	"../assets/batch03/p07.thumb.webp": p07_thumb_default$5,
 	"../assets/batch03/p07.webp": p07_default$5,
-	"../assets/batch03/p08.thumb.webp": p08_thumb_default$5,
-	"../assets/batch03/p08.webp": p08_default$5,
+	"../assets/batch03/p08.thumb.webp": p08_thumb_default$4,
+	"../assets/batch03/p08.webp": p08_default$4,
 	"../assets/batch03/p09.thumb.webp": p09_thumb_default$5,
 	"../assets/batch03/p09.webp": p09_default$5,
 	"../assets/batch03/p10.thumb.webp": p10_thumb_default$5,
@@ -3456,8 +3449,6 @@ var fullModules = /* #__PURE__ */ Object.assign({
 	"../assets/batch04/p06.webp": p06_default$3,
 	"../assets/batch04/p07.thumb.webp": p07_thumb_default$4,
 	"../assets/batch04/p07.webp": p07_default$4,
-	"../assets/batch04/p08.thumb.webp": p08_thumb_default$4,
-	"../assets/batch04/p08.webp": p08_default$4,
 	"../assets/batch04/p09.thumb.webp": p09_thumb_default$4,
 	"../assets/batch04/p09.webp": p09_default$4,
 	"../assets/batch04/p10.thumb.webp": p10_thumb_default$4,

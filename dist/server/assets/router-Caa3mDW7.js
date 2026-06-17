@@ -374,7 +374,7 @@ var Route$1 = createFileRoute("/about")({
 });
 //#endregion
 //#region src/routes/index.tsx
-var $$splitComponentImporter = () => import("./routes-D4a1MXV_.js");
+var $$splitComponentImporter = () => import("./routes-CLWonN5H.js");
 var Route = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Man of the Alps - Gallery" },
