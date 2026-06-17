@@ -4265,7 +4265,7 @@ function Lightbox({ photos, index, onIndexChange, onClose, getRect }) {
 	const flipDone = useRef(false);
 	const photo = photos[index];
 	const showNav = photos.length > 1 && !magnifyActive;
-	const imgClass = `block w-auto h-auto object-contain touch-manipulation max-w-[min(92vw,calc(100vw-10.5rem))] max-h-[calc(86vh-5.5rem)] ${!magnifyActive && !navTransition ? "cursor-zoom-out" : ""} ${magnifyActive ? "cursor-none" : ""}`;
+	const imgClass = `block w-auto h-auto object-contain touch-manipulation max-w-[calc(100vw-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px))] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-7.5rem)] md:max-w-[min(92vw,calc(100vw-10.5rem))] md:max-h-[calc(86vh-5.5rem)] ${!magnifyActive && !navTransition ? "cursor-zoom-out" : ""} ${magnifyActive ? "cursor-none" : ""}`;
 	const startNavAnimation = useCallback(() => {
 		if (navAnimStarted.current) return;
 		navAnimStarted.current = true;
@@ -4701,7 +4701,7 @@ function Lightbox({ photos, index, onIndexChange, onClose, getRect }) {
 				},
 				"aria-label": "Previous",
 				disabled: !!navTransition,
-				className: `interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 left-[max(1rem,env(safe-area-inset-left,0px))] md:left-16 top-1/2`,
+				className: `interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 left-[env(safe-area-inset-left,0px)] md:left-16 top-1/2`,
 				"data-cursor": "Prev",
 				children: /* @__PURE__ */ jsx(ChevronLeft, {
 					size: LIGHTBOX_ICON_SIZE,
@@ -4716,7 +4716,7 @@ function Lightbox({ photos, index, onIndexChange, onClose, getRect }) {
 				},
 				"aria-label": "Next",
 				disabled: !!navTransition,
-				className: `interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 right-[max(1rem,env(safe-area-inset-right,0px))] md:right-16 top-1/2`,
+				className: `interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 right-[env(safe-area-inset-right,0px)] md:right-16 top-1/2`,
 				"data-cursor": "Next",
 				children: /* @__PURE__ */ jsx(ChevronRight, {
 					size: LIGHTBOX_ICON_SIZE,
@@ -4725,14 +4725,14 @@ function Lightbox({ photos, index, onIndexChange, onClose, getRect }) {
 				})
 			})] }),
 			/* @__PURE__ */ jsx("div", {
-				className: "relative z-10 flex items-center justify-center w-full h-full px-4 md:px-16",
+				className: "relative z-10 flex items-center justify-center w-full h-full px-0 md:px-16",
 				onPointerDown,
 				onPointerMove,
 				onPointerUp,
 				onPointerCancel: onPointerUp,
 				style: { touchAction: "none" },
 				children: /* @__PURE__ */ jsxs("div", {
-					className: "relative flex w-fit max-w-[92vw] flex-col",
+					className: "relative flex w-fit max-w-full md:max-w-[92vw] flex-col",
 					onClick: (e) => e.stopPropagation(),
 					children: [/* @__PURE__ */ jsxs("div", {
 						className: "mb-2 flex w-full items-center justify-between",
