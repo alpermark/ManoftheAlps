@@ -78,6 +78,14 @@ export function CustomCursor() {
     };
 
     const tick = () => {
+      if (document.documentElement.classList.contains("has-magnify-lens")) {
+        if (dotRef.current) dotRef.current.style.opacity = "0";
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      if (dotRef.current) {
+        dotRef.current.style.opacity = visible ? "1" : "0";
+      }
       x += (tx - x) * 0.38;
       y += (ty - y) * 0.38;
       if (dotRef.current) {

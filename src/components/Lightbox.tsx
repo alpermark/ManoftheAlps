@@ -1,6 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import type { Photo } from "@/lib/photos";
+
+const LENS_SIZE = 560;
+const LENS_ZOOM = 2;
+
+interface LensState {
+  x: number;
+  y: number;
+  bgX: number;
+  bgY: number;
+  bgW: number;
+  bgH: number;
+}
 
 interface Props {
   photos: Photo[];
@@ -21,6 +33,8 @@ export function Lightbox({
   const [closing, setClosing] = useState(false);
   const [backdropIn, setBackdropIn] = useState(false);
   const [dragX, setDragX] = useState(0);
+  const [magnifyActive, setMagnifyActive] = useState(false);
+  const [lens, setLens] = useState<LensState | null>(null);
   const dragState = useRef<{
     active: boolean;
     startX: number;
@@ -35,6 +49,68 @@ export function Lightbox({
 
   const photo = photos[index];
   const flipDone = useRef(false);
+
+  const cancelMagnify = useCallback(() => {
+    setMagnifyActive(false);
+    setLens(null);
+    setDragX(0);
+    dragState.current.active = false;
+  }, []);
+
+  const activateMagnify = useCallback(() => {
+    setMagnifyActive(true);
+    setDragX(0);
+    dragState.current.active = false;
+  }, []);
+
+  const updateLens = useCallback((clientX: number, clientY: number) => {
+    const img = imgRef.current;
+    if (!img) return;
+
+    const rect = img.getBoundingClientRect();
+    if (
+      clientX < rect.left ||
+      clientX > rect.right ||
+      clientY < rect.top ||
+      clientY > rect.bottom
+    ) {
+      setLens(null);
+      return;
+    }
+
+    const relX = clientX - rect.left;
+    const relY = clientY - rect.top;
+    const bgW = rect.width * LENS_ZOOM;
+    const bgH = rect.height * LENS_ZOOM;
+
+    setLens({
+      x: clientX,
+      y: clientY,
+      bgX: -relX * LENS_ZOOM + LENS_SIZE / 2,
+      bgY: -relY * LENS_ZOOM + LENS_SIZE / 2,
+      bgW,
+      bgH,
+    });
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("has-magnify-lens", magnifyActive);
+    return () => {
+      document.documentElement.classList.remove("has-magnify-lens");
+    };
+  }, [magnifyActive]);
+
+  useEffect(() => {
+    setMagnifyActive(false);
+    setLens(null);
+  }, [index]);
+
+  useEffect(() => {
+    if (!magnifyActive) return;
+    const onMove = (e: MouseEvent) => updateLens(e.clientX, e.clientY);
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [magnifyActive, updateLens]);
 
   // Body scroll lock
   useEffect(() => {
@@ -68,7 +144,6 @@ export function Lightbox({
       el.style.transition = "none";
       el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
       el.style.opacity = "0.6";
-      // force reflow
       void el.offsetWidth;
       el.style.transition =
         "transform 520ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 320ms ease";
@@ -87,6 +162,7 @@ export function Lightbox({
     const rect = getRect(index);
     setClosing(true);
     setBackdropIn(false);
+    cancelMagnify();
     if (el && rect) {
       const target = el.getBoundingClientRect();
       const dx = rect.left + rect.width / 2 - (target.left + target.width / 2);
@@ -100,7 +176,7 @@ export function Lightbox({
       el.style.opacity = "0";
     }
     window.setTimeout(onClose, 480);
-  }, [getRect, index, onClose]);
+  }, [cancelMagnify, getRect, index, onClose]);
 
   const go = useCallback(
     (delta: number) => {
@@ -110,7 +186,6 @@ export function Lightbox({
     [index, photos.length, onIndexChange],
   );
 
-  // Re-run enter animation when index changes (after first mount), for nav.
   const firstRun = useRef(true);
   useEffect(() => {
     if (firstRun.current) {
@@ -129,20 +204,25 @@ export function Lightbox({
     return () => window.clearTimeout(t);
   }, [index]);
 
-  // Keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-      else if (e.key === "ArrowRight") go(1);
-      else if (e.key === "ArrowLeft") go(-1);
+      if (e.key === "Escape") {
+        if (magnifyActive) {
+          cancelMagnify();
+          return;
+        }
+        close();
+      } else if (!magnifyActive) {
+        if (e.key === "ArrowRight") go(1);
+        else if (e.key === "ArrowLeft") go(-1);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [close, go]);
+  }, [cancelMagnify, close, go, magnifyActive]);
 
-  // Drag / swipe
   const onPointerDown = (e: React.PointerEvent) => {
-    if (closing) return;
+    if (closing || magnifyActive) return;
     dragState.current = {
       active: true,
       startX: e.clientX,
@@ -152,6 +232,7 @@ export function Lightbox({
     (e.target as Element).setPointerCapture?.(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
+    if (magnifyActive) return;
     const s = dragState.current;
     if (!s.active) return;
     const dx = e.clientX - s.startX;
@@ -170,6 +251,7 @@ export function Lightbox({
     setDragX(dx);
   };
   const onPointerUp = (e: React.PointerEvent) => {
+    if (magnifyActive) return;
     const s = dragState.current;
     if (!s.active) return;
     const dx = e.clientX - s.startX;
@@ -180,49 +262,97 @@ export function Lightbox({
     }
   };
 
+  const handleSurfaceClick = () => {
+    if (magnifyActive) cancelMagnify();
+    else close();
+  };
+
   return (
     <div
       className="fixed inset-0 z-[1000] flex items-center justify-center select-none"
       role="dialog"
       aria-modal="true"
       aria-label={photo.title}
+      onClick={handleSurfaceClick}
     >
       {/* Backdrop */}
       <div
-        onClick={close}
         className="absolute inset-0 bg-black transition-opacity duration-500"
         style={{ opacity: backdropIn ? 0.92 : 0 }}
       />
 
-      {/* Image */}
+      {/* Image frame */}
       <div
         className="relative z-10 flex items-center justify-center w-full h-full px-4 md:px-16"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        style={{ touchAction: "pan-y" }}
+        style={{ touchAction: magnifyActive ? "none" : "pan-y" }}
       >
-        <img
-          ref={imgRef}
-          src={photo.src}
-          alt={photo.title}
-          {...(photo.width > 0 && photo.height > 0
-            ? { width: photo.width, height: photo.height }
-            : {})}
-          draggable={false}
-          onLoad={handleImageLoad}
-          onClick={(e) => {
-            e.stopPropagation();
-            close();
-          }}
-          style={{
-            transform: dragX ? `translateX(${dragX}px)` : undefined,
-            transition: dragX ? "none" : undefined,
-          }}
-          className="max-w-[92vw] max-h-[86vh] w-auto h-auto object-contain cursor-zoom-out"
-          data-cursor="Close"
-        />
+        <div
+          className="relative max-w-[92vw] max-h-[86vh]"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (magnifyActive) cancelMagnify();
+              else activateMagnify();
+            }}
+            aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
+            aria-pressed={magnifyActive}
+            className={`interactive-target absolute bottom-full left-0 z-10 mb-2 transition-colors ${
+              magnifyActive ? "text-red-500 pointer-events-none" : "text-white/70 hover:text-white"
+            }`}
+            data-cursor={magnifyActive ? undefined : "Magnify"}
+          >
+            <ZoomIn size={20} strokeWidth={1.5} />
+          </button>
+
+          <img
+            ref={imgRef}
+            src={photo.src}
+            alt={photo.title}
+            {...(photo.width > 0 && photo.height > 0
+              ? { width: photo.width, height: photo.height }
+              : {})}
+            draggable={false}
+            onLoad={handleImageLoad}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (magnifyActive) cancelMagnify();
+              else close();
+            }}
+            style={{
+              transform: dragX ? `translateX(${dragX}px)` : undefined,
+              transition: dragX ? "none" : undefined,
+            }}
+            className={`max-w-[92vw] max-h-[86vh] w-auto h-auto object-contain ${
+              magnifyActive ? "cursor-none" : "cursor-zoom-out"
+            }`}
+            data-cursor={magnifyActive ? undefined : "Close"}
+          />
+
+          {magnifyActive && lens && (
+            <div
+              aria-hidden
+              className="pointer-events-none fixed z-[1001] overflow-hidden rounded-full"
+              style={{
+                width: LENS_SIZE,
+                height: LENS_SIZE,
+                left: lens.x,
+                top: lens.y,
+                transform: "translate(-50%, -50%)",
+                backgroundImage: `url(${photo.src})`,
+                backgroundRepeat: "no-repeat",
+                backgroundSize: `${lens.bgW}px ${lens.bgH}px`,
+                backgroundPosition: `${lens.bgX}px ${lens.bgY}px`,
+              }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Caption */}
@@ -237,16 +367,20 @@ export function Lightbox({
       {/* Close */}
       <button
         type="button"
-        onClick={close}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (magnifyActive) cancelMagnify();
+          else close();
+        }}
         aria-label="Close"
         className="absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] end-4 sm:end-5 z-20 interactive-target inline-flex items-center justify-center text-white/80 hover:text-white transition-colors"
-        data-cursor="Close"
+        data-cursor={magnifyActive ? undefined : "Close"}
       >
         <X size={22} aria-hidden />
       </button>
 
       {/* Arrows */}
-      {photos.length > 1 && (
+      {photos.length > 1 && !magnifyActive && (
         <>
           <button
             type="button"
