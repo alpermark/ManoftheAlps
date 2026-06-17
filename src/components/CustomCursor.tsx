@@ -11,7 +11,6 @@ export function CustomCursor() {
   const dotRef = useRef<HTMLDivElement>(null);
   const visibleRef = useRef(false);
   const [label, setLabel] = useState<string | null>(null);
-  const [visible, setVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [enabled, setEnabled] = useState(false);
 
@@ -43,7 +42,6 @@ export function CustomCursor() {
     if (!enabled) {
       document.documentElement.classList.remove("has-custom-cursor");
       visibleRef.current = false;
-      setVisible(false);
       setLabel(null);
       return;
     }
@@ -61,7 +59,6 @@ export function CustomCursor() {
       ty = e.clientY;
       if (!visibleRef.current) {
         visibleRef.current = true;
-        setVisible(true);
         // Snap to pointer on first move so the cursor doesn't drift in from center.
         x = tx;
         y = ty;
@@ -74,7 +71,6 @@ export function CustomCursor() {
 
     const onLeave = () => {
       visibleRef.current = false;
-      setVisible(false);
     };
 
     const tick = () => {
@@ -84,7 +80,7 @@ export function CustomCursor() {
         return;
       }
       if (dotRef.current) {
-        dotRef.current.style.opacity = visible ? "1" : "0";
+        dotRef.current.style.opacity = visibleRef.current ? "1" : "0";
       }
       x += (tx - x) * 0.38;
       y += (ty - y) * 0.38;
@@ -113,7 +109,7 @@ export function CustomCursor() {
       ref={dotRef}
       aria-hidden
       className="pointer-events-none fixed left-0 top-0 z-[99999] hidden md:flex items-center justify-center"
-      style={{ opacity: visible ? 1 : 0, transition: "opacity 200ms ease" }}
+      style={{ opacity: 0, transition: "opacity 200ms ease" }}
     >
       <div
         className="flex items-center justify-center rounded-full bg-foreground text-background transition-all duration-300 ease-out"
