@@ -8,6 +8,7 @@ const LIGHTBOX_ICON_SIZE = 33;
 const LIGHTBOX_ICON_BTN = "h-[4.125rem] w-[4.125rem]";
 /** Mobile lens is 180% larger than the base viewport-fit size (2.8× total). */
 const MOBILE_LENS_SCALE = 2.8;
+const SWIPE_THRESHOLD = 70;
 
 function isTouchLikeDevice() {
   if (typeof window === "undefined") return false;
@@ -75,9 +76,17 @@ export function Lightbox({
     startX: 0,
     startY: 0,
   });
-  const imageTouch = useRef({ active: false, moved: false, startX: 0, startY: 0 });
+  const imageTouch = useRef({
+    active: false,
+    moved: false,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+  });
   const magnifyActiveRef = useRef(false);
   const closeRef = useRef<() => void>(() => {});
+  const goRef = useRef<(delta: number) => void>(() => {});
 
   const photo = photos[index];
   const flipDone = useRef(false);
@@ -203,9 +212,12 @@ export function Lightbox({
       return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
     };
 
+    const isInteractiveTarget = (target: EventTarget | null) =>
+      (target as Element | null)?.closest("button") != null;
+
     const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
-      if (!t) return;
+      if (!t || isInteractiveTarget(e.target)) return;
 
       if (magnifyActiveRef.current) {
         touchMagnify.current = {
@@ -217,13 +229,13 @@ export function Lightbox({
         return;
       }
 
-      if (!isOnImage(t.clientX, t.clientY)) return;
-
       imageTouch.current = {
         active: true,
         moved: false,
         startX: t.clientX,
         startY: t.clientY,
+        lastX: t.clientX,
+        lastY: t.clientY,
       };
     };
 
@@ -242,11 +254,25 @@ export function Lightbox({
         return;
       }
 
-      const dx = t.clientX - imageTouch.current.startX;
-      const dy = t.clientY - imageTouch.current.startY;
-      if (Math.hypot(dx, dy) > 12) {
-        imageTouch.current.moved = true;
+      const nav = imageTouch.current;
+      if (!nav.active) return;
+
+      nav.lastX = t.clientX;
+      nav.lastY = t.clientY;
+      const dx = t.clientX - nav.startX;
+      const dy = t.clientY - nav.startY;
+
+      if (!nav.moved) {
+        if (Math.abs(dx) < 12 && Math.abs(dy) < 12) return;
+        if (Math.abs(dx) <= Math.abs(dy)) {
+          nav.active = false;
+          return;
+        }
+        nav.moved = true;
       }
+
+      e.preventDefault();
+      setDragX(dx);
     };
 
     const onTouchEnd = () => {
@@ -262,9 +288,31 @@ export function Lightbox({
         return;
       }
 
-      const { active, moved } = imageTouch.current;
-      imageTouch.current = { active: false, moved: false, startX: 0, startY: 0 };
-      if (active && !moved) closeRef.current();
+      const nav = imageTouch.current;
+      if (!nav.active) return;
+
+      const dx = nav.lastX - nav.startX;
+      const tapOnImage =
+        isOnImage(nav.startX, nav.startY) && isOnImage(nav.lastX, nav.lastY);
+
+      imageTouch.current = {
+        active: false,
+        moved: false,
+        startX: 0,
+        startY: 0,
+        lastX: 0,
+        lastY: 0,
+      };
+      setDragX(0);
+
+      if (nav.moved && Math.abs(dx) > SWIPE_THRESHOLD) {
+        goRef.current(dx < 0 ? 1 : -1);
+        return;
+      }
+
+      if (!nav.moved && tapOnImage) {
+        closeRef.current();
+      }
     };
 
     lightbox.addEventListener("touchstart", onTouchStart, { passive: true });
@@ -344,10 +392,6 @@ export function Lightbox({
     window.setTimeout(onClose, 480);
   }, [cancelMagnify, getRect, index, onClose]);
 
-  useEffect(() => {
-    closeRef.current = close;
-  }, [close]);
-
   const go = useCallback(
     (delta: number) => {
       const next = (index + delta + photos.length) % photos.length;
@@ -355,6 +399,14 @@ export function Lightbox({
     },
     [index, photos.length, onIndexChange],
   );
+
+  useEffect(() => {
+    closeRef.current = close;
+  }, [close]);
+
+  useEffect(() => {
+    goRef.current = go;
+  }, [go]);
 
   const firstRun = useRef(true);
   useEffect(() => {
@@ -392,7 +444,8 @@ export function Lightbox({
   }, [cancelMagnify, close, go, magnifyActive]);
 
   const onPointerDown = (e: React.PointerEvent) => {
-    if (closing || magnifyActive) return;
+    if (closing || magnifyActive || e.pointerType === "touch") return;
+    if ((e.target as Element).closest("button")) return;
     dragState.current = {
       active: true,
       startX: e.clientX,
@@ -429,7 +482,7 @@ export function Lightbox({
     const dx = e.clientX - s.startX;
     s.active = false;
     setDragX(0);
-    if (Math.abs(dx) > 70) {
+    if (Math.abs(dx) > SWIPE_THRESHOLD) {
       go(dx < 0 ? 1 : -1);
     }
   };
@@ -472,7 +525,7 @@ export function Lightbox({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        style={{ touchAction: magnifyActive ? "none" : "pan-y" }}
+        style={{ touchAction: "none" }}
       >
         <div
           className="relative flex w-fit max-w-[92vw] flex-col"
@@ -513,7 +566,23 @@ export function Lightbox({
             </button>
           </div>
 
-          <div ref={lensAreaRef} className="relative touch-none">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+            {photos.length > 1 && !magnifyActive && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  go(-1);
+                }}
+                aria-label="Previous"
+                className={`interactive-target inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation`}
+                data-cursor="Prev"
+              >
+                <ChevronLeft size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
+              </button>
+            )}
+
+            <div ref={lensAreaRef} className="relative min-w-0 touch-none">
             <img
               ref={imgRef}
               src={photo.src}
@@ -531,9 +600,11 @@ export function Lightbox({
                 transform: dragX ? `translateX(${dragX}px)` : undefined,
                 transition: dragX ? "none" : undefined,
               }}
-              className={`max-w-[92vw] max-h-[calc(86vh-5.5rem)] w-auto h-auto object-contain touch-manipulation ${
-                magnifyActive ? "cursor-none" : "cursor-zoom-out"
-              }`}
+              className={`w-auto h-auto object-contain touch-manipulation ${
+                photos.length > 1 && !magnifyActive
+                  ? "max-w-[min(92vw,calc(100vw-10.5rem))] max-h-[calc(86vh-5.5rem)]"
+                  : "max-w-[92vw] max-h-[calc(86vh-5.5rem)]"
+              } ${magnifyActive ? "cursor-none" : "cursor-zoom-out"}`}
               data-cursor={magnifyActive ? undefined : "Close"}
             />
 
@@ -554,6 +625,22 @@ export function Lightbox({
                 }}
               />
             )}
+            </div>
+
+            {photos.length > 1 && !magnifyActive && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  go(1);
+                }}
+                aria-label="Next"
+                className={`interactive-target inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation`}
+                data-cursor="Next"
+              >
+                <ChevronRight size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -565,35 +652,6 @@ export function Lightbox({
           {index + 1} / {photos.length}
         </span>
       </div>
-
-      {photos.length > 1 && !magnifyActive && (
-        <>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              go(-1);
-            }}
-            aria-label="Previous"
-            className="absolute start-1 sm:start-4 md:start-6 top-1/2 -translate-y-1/2 z-20 interactive-target inline-flex items-center justify-center text-white/70 active:text-white transition-colors touch-manipulation"
-            data-cursor="Prev"
-          >
-            <ChevronLeft size={32} aria-hidden className="sm:w-9 sm:h-9" />
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              go(1);
-            }}
-            aria-label="Next"
-            className="absolute end-1 sm:end-4 md:end-6 top-1/2 -translate-y-1/2 z-20 interactive-target inline-flex items-center justify-center text-white/70 active:text-white transition-colors touch-manipulation"
-            data-cursor="Next"
-          >
-            <ChevronRight size={32} aria-hidden className="sm:w-9 sm:h-9" />
-          </button>
-        </>
-      )}
     </div>
   );
 }
