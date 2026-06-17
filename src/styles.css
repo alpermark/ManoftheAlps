@@ -200,11 +200,18 @@
 
 @utility nav-label {
   font-family: var(--font-sans);
-  font-size: clamp(0.625rem, 1.6vw, 0.72rem);
+  /* Mobile: 20% larger than desktop scale */
+  font-size: clamp(0.75rem, 1.92vw, 0.864rem);
   font-weight: 500;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+  .nav-label {
+    font-size: clamp(0.625rem, 1.6vw, 0.72rem);
+  }
 }
 
 @utility wordmark {
@@ -212,7 +219,14 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 0.88;
-  font-size: clamp(2.75rem, 11vw, 15rem);
+  /* Mobile: 50% larger than desktop scale */
+  font-size: clamp(4.125rem, 16.5vw, 15rem);
+}
+
+@media (min-width: 640px) {
+  .wordmark {
+    font-size: clamp(2.75rem, 11vw, 15rem);
+  }
 }
 
 @utility page-title {
