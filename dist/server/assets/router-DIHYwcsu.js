@@ -4,7 +4,7 @@ import { jsx, jsxs } from "react/jsx-runtime";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createPortal } from "react-dom";
 //#region src/styles.css?url
-var styles_default = "/assets/styles-CAMV2Nv4.css";
+var styles_default = "/assets/styles-DHxi21mr.css";
 //#endregion
 //#region src/components/SiteHeader.tsx
 var navLinkClass = "quiet-link opacity-70 transition-opacity hover:opacity-100 focus-visible:opacity-100";
@@ -374,7 +374,7 @@ var Route$1 = createFileRoute("/about")({
 });
 //#endregion
 //#region src/routes/index.tsx
-var $$splitComponentImporter = () => import("./routes-DBhrelHn.js");
+var $$splitComponentImporter = () => import("./routes-D4a1MXV_.js");
 var Route = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Man of the Alps - Gallery" },

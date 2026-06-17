@@ -105,7 +105,7 @@ export function Lightbox({
   const photo = photos[index];
   const showNav = photos.length > 1 && !magnifyActive;
 
-  const imgClass = `block w-auto h-auto object-contain touch-manipulation max-w-[calc(100vw-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px))] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-7.5rem)] md:max-w-[min(92vw,calc(100vw-10.5rem))] md:max-h-[calc(86vh-5.5rem)] ${
+  const imgClass = `block w-auto h-auto object-contain touch-manipulation max-w-[calc(100vw-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px))] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-4.125rem)] md:max-w-[min(92vw,calc(100vw-10.5rem))] md:max-h-[calc(86vh-5.5rem)] ${
     !magnifyActive && !navTransition ? "cursor-zoom-out" : ""
   } ${magnifyActive ? "cursor-none" : ""}`;
 
@@ -611,7 +611,7 @@ export function Lightbox({
             }}
             aria-label="Previous"
             disabled={!!navTransition}
-            className={`interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 left-[env(safe-area-inset-left,0px)] md:left-16 top-1/2`}
+            className={`interactive-target fixed z-20 hidden md:inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 left-16 top-1/2`}
             data-cursor="Prev"
           >
             <ChevronLeft size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
@@ -624,13 +624,55 @@ export function Lightbox({
             }}
             aria-label="Next"
             disabled={!!navTransition}
-            className={`interactive-target fixed z-20 inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 right-[env(safe-area-inset-right,0px)] md:right-16 top-1/2`}
+            className={`interactive-target fixed z-20 hidden md:inline-flex ${LIGHTBOX_ICON_BTN} -translate-y-1/2 items-center justify-center text-white/70 hover:text-white active:text-white transition-colors touch-manipulation disabled:opacity-40 right-16 top-1/2`}
             data-cursor="Next"
           >
             <ChevronRight size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
           </button>
         </>
       )}
+
+      <div className="fixed inset-x-0 bottom-0 z-20 flex md:hidden items-center justify-between pb-[env(safe-area-inset-bottom,0px)] pl-[env(safe-area-inset-left,0px)] pr-[env(safe-area-inset-right,0px)]">
+        {showNav ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(-1);
+            }}
+            aria-label="Previous"
+            disabled={!!navTransition}
+            className={`interactive-target inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center text-white/70 active:text-white transition-colors touch-manipulation disabled:opacity-40`}
+            data-cursor="Prev"
+          >
+            <ChevronLeft size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
+          </button>
+        ) : (
+          <div className={`${LIGHTBOX_ICON_BTN} shrink-0`} aria-hidden />
+        )}
+        <span className="nav-label min-w-0 flex-1 truncate px-2 text-center text-white/80 pointer-events-none">
+          {photo.title}
+          <span className="opacity-50 mx-2">/</span>
+          {index + 1} / {photos.length}
+        </span>
+        {showNav ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(1);
+            }}
+            aria-label="Next"
+            disabled={!!navTransition}
+            className={`interactive-target inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center text-white/70 active:text-white transition-colors touch-manipulation disabled:opacity-40`}
+            data-cursor="Next"
+          >
+            <ChevronRight size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
+          </button>
+        ) : (
+          <div className={`${LIGHTBOX_ICON_BTN} shrink-0`} aria-hidden />
+        )}
+      </div>
 
       <div
         className="relative z-10 flex items-center justify-center w-full h-full px-0 md:px-16"
@@ -644,7 +686,7 @@ export function Lightbox({
           className="relative flex w-fit max-w-full md:max-w-[92vw] flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="mb-2 flex w-full items-center justify-between">
+          <div className="fixed inset-x-0 top-0 z-20 mb-0 flex items-center justify-between px-2 pt-[env(safe-area-inset-top,0px)] md:relative md:inset-auto md:mb-2 md:px-0 md:pt-0">
             <button
               type="button"
               onClick={(e) => {
@@ -777,7 +819,7 @@ export function Lightbox({
         </div>
       </div>
 
-      <div className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom,0px))] inset-x-0 z-20 px-4 text-center pointer-events-none">
+      <div className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom,0px))] inset-x-0 z-20 hidden px-4 text-center pointer-events-none md:block">
         <span className="nav-label text-white/80">
           {photo.title}
           <span className="opacity-50 mx-2">/</span>

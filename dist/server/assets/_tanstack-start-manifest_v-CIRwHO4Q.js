@@ -7,27 +7,27 @@ var tsrStartManifest = () => ({ routes: {
 			"/about",
 			"/contact"
 		],
-		preloads: ["/assets/index-Basv2r4n.js"],
+		preloads: ["/assets/index-CQ2mYDkP.js"],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-Basv2r4n.js"
+			src: "/assets/index-CQ2mYDkP.js"
 		} }]
 	},
 	"/": {
 		filePath: "/Users/markalper/Documents/GitHub/ManoftheAlps/src/routes/index.tsx",
 		children: void 0,
-		preloads: ["/assets/routes-Vns-q64H.js"]
+		preloads: ["/assets/routes-C8AULoqm.js"]
 	},
 	"/about": {
 		filePath: "/Users/markalper/Documents/GitHub/ManoftheAlps/src/routes/about.tsx",
 		children: void 0,
-		preloads: ["/assets/about-B8aZ3QjN.js"]
+		preloads: ["/assets/about-C0A4PJ7D.js"]
 	},
 	"/contact": {
 		filePath: "/Users/markalper/Documents/GitHub/ManoftheAlps/src/routes/contact.tsx",
 		children: void 0,
-		preloads: ["/assets/contact-DsD-Ce8S.js"]
+		preloads: ["/assets/contact-DC7lPbSt.js"]
 	}
 } });
 //#endregion
