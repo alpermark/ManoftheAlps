@@ -62,6 +62,9 @@ export function CustomCursor() {
       if (!visibleRef.current) {
         visibleRef.current = true;
         setVisible(true);
+        // Snap to pointer on first move so the cursor doesn't drift in from center.
+        x = tx;
+        y = ty;
       }
 
       const el = (e.target as HTMLElement | null)?.closest<HTMLElement>("[data-cursor]");
@@ -75,8 +78,8 @@ export function CustomCursor() {
     };
 
     const tick = () => {
-      x += (tx - x) * 0.22;
-      y += (ty - y) * 0.22;
+      x += (tx - x) * 0.38;
+      y += (ty - y) * 0.38;
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
       }
