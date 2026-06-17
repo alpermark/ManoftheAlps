@@ -4,6 +4,8 @@ import type { Photo } from "@/lib/photos";
 
 const LENS_ZOOM = 2;
 const LENS_SIZE_DESKTOP = 560;
+/** Mobile lens is 180% larger than the base viewport-fit size (2.8× total). */
+const MOBILE_LENS_SCALE = 2.8;
 
 function isTouchLikeDevice() {
   if (typeof window === "undefined") return false;
@@ -15,8 +17,14 @@ function isTouchLikeDevice() {
 
 function lensSizeForViewport() {
   if (typeof window === "undefined") return LENS_SIZE_DESKTOP;
-  const cap = Math.min(window.innerWidth, window.innerHeight) * 0.88;
-  return Math.min(LENS_SIZE_DESKTOP, cap);
+  const viewportMin = Math.min(window.innerWidth, window.innerHeight);
+  const cap = viewportMin * 0.88;
+  let size = Math.min(LENS_SIZE_DESKTOP, cap);
+  if (isTouchLikeDevice()) {
+    size *= MOBILE_LENS_SCALE;
+    size = Math.min(size, viewportMin * 0.98);
+  }
+  return size;
 }
 
 interface LensState {
@@ -46,6 +54,7 @@ export function Lightbox({
 }: Props) {
   const imgRef = useRef<HTMLImageElement>(null);
   const lensAreaRef = useRef<HTMLDivElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
   const [closing, setClosing] = useState(false);
   const [backdropIn, setBackdropIn] = useState(false);
   const [dragX, setDragX] = useState(0);
@@ -58,7 +67,12 @@ export function Lightbox({
     startY: 0,
     locked: false,
   });
-  const touchMagnify = useRef({ active: false, moved: false });
+  const touchMagnify = useRef({
+    active: false,
+    moved: false,
+    startX: 0,
+    startY: 0,
+  });
   const imageTouch = useRef({ active: false, moved: false, startX: 0, startY: 0 });
   const magnifyActiveRef = useRef(false);
   const closeRef = useRef<() => void>(() => {});
@@ -140,14 +154,14 @@ export function Lightbox({
     setLens(null);
     setDragX(0);
     dragState.current.active = false;
-    touchMagnify.current = { active: false, moved: false };
+    touchMagnify.current = { active: false, moved: false, startX: 0, startY: 0 };
   }, []);
 
   const activateMagnify = useCallback(() => {
     setMagnifyActive(true);
     setDragX(0);
     dragState.current.active = false;
-    touchMagnify.current = { active: false, moved: false };
+    touchMagnify.current = { active: false, moved: false, startX: 0, startY: 0 };
     requestAnimationFrame(() => {
       centerLens();
       requestAnimationFrame(centerLens);
@@ -174,19 +188,34 @@ export function Lightbox({
     return () => window.removeEventListener("mousemove", onMove);
   }, [magnifyActive, isTouchLike, updateLens]);
 
-  // Touch drag for magnifier — passive: false so we can prevent scroll.
+  // Touch: magnify drag + tap-anywhere to dismiss; image tap to close lightbox.
   useEffect(() => {
-    const el = lensAreaRef.current;
-    if (!el) return;
+    const lightbox = lightboxRef.current;
+    const imageArea = lensAreaRef.current;
+    if (!lightbox || !imageArea) return;
+
+    const isOnImage = (x: number, y: number) => {
+      const img = imgRef.current;
+      if (!img) return false;
+      const rect = img.getBoundingClientRect();
+      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+    };
 
     const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
       if (!t) return;
 
       if (magnifyActiveRef.current) {
-        touchMagnify.current = { active: true, moved: false };
+        touchMagnify.current = {
+          active: true,
+          moved: false,
+          startX: t.clientX,
+          startY: t.clientY,
+        };
         return;
       }
+
+      if (!isOnImage(t.clientX, t.clientY)) return;
 
       imageTouch.current = {
         active: true,
@@ -201,9 +230,13 @@ export function Lightbox({
       if (!t) return;
 
       if (magnifyActiveRef.current) {
-        e.preventDefault();
-        touchMagnify.current.moved = true;
-        updateLens(t.clientX, t.clientY, true);
+        const dx = t.clientX - touchMagnify.current.startX;
+        const dy = t.clientY - touchMagnify.current.startY;
+        if (Math.hypot(dx, dy) > 12) {
+          touchMagnify.current.moved = true;
+          e.preventDefault();
+          updateLens(t.clientX, t.clientY, true);
+        }
         return;
       }
 
@@ -217,7 +250,12 @@ export function Lightbox({
     const onTouchEnd = () => {
       if (magnifyActiveRef.current) {
         const { active, moved } = touchMagnify.current;
-        touchMagnify.current = { active: false, moved: false };
+        touchMagnify.current = {
+          active: false,
+          moved: false,
+          startX: 0,
+          startY: 0,
+        };
         if (active && !moved) cancelMagnify();
         return;
       }
@@ -227,16 +265,16 @@ export function Lightbox({
       if (active && !moved) closeRef.current();
     };
 
-    el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: false });
-    el.addEventListener("touchend", onTouchEnd, { passive: false });
-    el.addEventListener("touchcancel", onTouchEnd, { passive: false });
+    lightbox.addEventListener("touchstart", onTouchStart, { passive: true });
+    lightbox.addEventListener("touchmove", onTouchMove, { passive: false });
+    lightbox.addEventListener("touchend", onTouchEnd, { passive: true });
+    lightbox.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
     return () => {
-      el.removeEventListener("touchstart", onTouchStart);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
-      el.removeEventListener("touchcancel", onTouchEnd);
+      lightbox.removeEventListener("touchstart", onTouchStart);
+      lightbox.removeEventListener("touchmove", onTouchMove);
+      lightbox.removeEventListener("touchend", onTouchEnd);
+      lightbox.removeEventListener("touchcancel", onTouchEnd);
     };
   }, [cancelMagnify, updateLens]);
 
@@ -397,7 +435,8 @@ export function Lightbox({
   const handleImageTap = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (magnifyActive) {
-      if (!isTouchLike) cancelMagnify();
+      if (isTouchLike) return;
+      cancelMagnify();
       return;
     }
     close();
@@ -405,7 +444,7 @@ export function Lightbox({
 
   const handleSurfaceClick = () => {
     if (magnifyActive) {
-      if (!isTouchLike) cancelMagnify();
+      cancelMagnify();
       return;
     }
     close();
@@ -413,6 +452,7 @@ export function Lightbox({
 
   return (
     <div
+      ref={lightboxRef}
       className="fixed inset-0 z-[1000] flex items-center justify-center select-none"
       role="dialog"
       aria-modal="true"
@@ -436,25 +476,6 @@ export function Lightbox({
           className="relative max-w-[92vw] max-h-[86vh]"
           onClick={(e) => e.stopPropagation()}
         >
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (magnifyActive) cancelMagnify();
-              else activateMagnify();
-            }}
-            aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
-            aria-pressed={magnifyActive}
-            className={`absolute bottom-full left-0 z-20 mb-2 flex h-11 w-11 items-center justify-center transition-colors touch-manipulation ${
-              magnifyActive
-                ? "text-red-500 pointer-events-none"
-                : "text-white/70 active:text-white"
-            }`}
-            data-cursor={magnifyActive ? undefined : "Magnify"}
-          >
-            <ZoomIn size={22} strokeWidth={1.5} />
-          </button>
-
           <div ref={lensAreaRef} className="relative touch-none">
             <img
               ref={imgRef}
@@ -507,6 +528,25 @@ export function Lightbox({
           {index + 1} / {photos.length}
         </span>
       </div>
+
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          if (magnifyActive) cancelMagnify();
+          else activateMagnify();
+        }}
+        aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
+        aria-pressed={magnifyActive}
+        className={`absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] start-4 sm:start-5 z-20 inline-flex h-[4.125rem] w-[4.125rem] items-center justify-center transition-colors touch-manipulation ${
+          magnifyActive
+            ? "text-red-500 pointer-events-none"
+            : "text-white/70 hover:text-white active:text-white"
+        }`}
+        data-cursor={magnifyActive ? undefined : "Magnify"}
+      >
+        <ZoomIn size={33} strokeWidth={1.5} />
+      </button>
 
       <button
         type="button"
