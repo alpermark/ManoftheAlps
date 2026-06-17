@@ -109,7 +109,7 @@ function seededShuffle<T>(items: T[], seed: number): T[] {
 /** Featured photos shown first, in this order. */
 const FEATURED_FIRST = [
   "batch01-p09",
-  "batch06-p62",
+  "batch09-p37",
   "batch05-p17",
   "batch06-p02",
   "batch01-p07",
@@ -227,7 +227,7 @@ export const photos: Photo[] = moveToIndex(
     swapById(
       pinFeaturedFirst(spreadGallery(entries)),
       "batch03-p24",
-      "batch06-p62",
+      "batch09-p37",
     ),
     "batch03-p48",
     130,
