@@ -4,6 +4,8 @@ import type { Photo } from "@/lib/photos";
 
 const LENS_ZOOM = 2;
 const LENS_SIZE_DESKTOP = 560;
+const LIGHTBOX_ICON_SIZE = 33;
+const LIGHTBOX_ICON_BTN = "h-[4.125rem] w-[4.125rem]";
 /** Mobile lens is 180% larger than the base viewport-fit size (2.8× total). */
 const MOBILE_LENS_SCALE = 2.8;
 
@@ -473,10 +475,10 @@ export function Lightbox({
         style={{ touchAction: magnifyActive ? "none" : "pan-y" }}
       >
         <div
-          className="relative w-fit max-w-[92vw]"
+          className="relative flex w-fit max-w-[92vw] flex-col"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="absolute bottom-full inset-x-0 z-20 mb-2 flex items-center justify-between">
+          <div className="mb-2 flex w-full items-center justify-between">
             <button
               type="button"
               onClick={(e) => {
@@ -486,14 +488,14 @@ export function Lightbox({
               }}
               aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
               aria-pressed={magnifyActive}
-              className={`inline-flex h-[4.125rem] w-[4.125rem] shrink-0 items-center justify-center transition-colors touch-manipulation ${
+              className={`inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center transition-colors touch-manipulation ${
                 magnifyActive
                   ? "text-red-500 pointer-events-none"
                   : "text-white/70 hover:text-white active:text-white"
               }`}
               data-cursor={magnifyActive ? undefined : "Magnify"}
             >
-              <ZoomIn size={33} strokeWidth={1.5} />
+              <ZoomIn size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} />
             </button>
 
             <button
@@ -504,10 +506,10 @@ export function Lightbox({
                 else close();
               }}
               aria-label="Close"
-              className="interactive-target inline-flex h-[4.125rem] w-[4.125rem] shrink-0 items-center justify-center text-white/80 hover:text-white active:text-white transition-colors touch-manipulation"
+              className={`interactive-target inline-flex ${LIGHTBOX_ICON_BTN} shrink-0 items-center justify-center text-white/80 hover:text-white active:text-white transition-colors touch-manipulation`}
               data-cursor={magnifyActive ? undefined : "Close"}
             >
-              <X size={33} aria-hidden strokeWidth={1.5} />
+              <X size={LIGHTBOX_ICON_SIZE} strokeWidth={1.5} aria-hidden />
             </button>
           </div>
 
@@ -529,7 +531,7 @@ export function Lightbox({
                 transform: dragX ? `translateX(${dragX}px)` : undefined,
                 transition: dragX ? "none" : undefined,
               }}
-              className={`max-w-[92vw] max-h-[86vh] w-auto h-auto object-contain touch-manipulation ${
+              className={`max-w-[92vw] max-h-[calc(86vh-5.5rem)] w-auto h-auto object-contain touch-manipulation ${
                 magnifyActive ? "cursor-none" : "cursor-zoom-out"
               }`}
               data-cursor={magnifyActive ? undefined : "Close"}
