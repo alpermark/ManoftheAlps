@@ -473,9 +473,44 @@ export function Lightbox({
         style={{ touchAction: magnifyActive ? "none" : "pan-y" }}
       >
         <div
-          className="relative max-w-[92vw] max-h-[86vh]"
+          className="relative w-fit max-w-[92vw]"
           onClick={(e) => e.stopPropagation()}
         >
+          <div className="absolute bottom-full inset-x-0 z-20 mb-2 flex items-center justify-between">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (magnifyActive) cancelMagnify();
+                else activateMagnify();
+              }}
+              aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
+              aria-pressed={magnifyActive}
+              className={`inline-flex h-[4.125rem] w-[4.125rem] shrink-0 items-center justify-center transition-colors touch-manipulation ${
+                magnifyActive
+                  ? "text-red-500 pointer-events-none"
+                  : "text-white/70 hover:text-white active:text-white"
+              }`}
+              data-cursor={magnifyActive ? undefined : "Magnify"}
+            >
+              <ZoomIn size={33} strokeWidth={1.5} />
+            </button>
+
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (magnifyActive) cancelMagnify();
+                else close();
+              }}
+              aria-label="Close"
+              className="interactive-target inline-flex h-[4.125rem] w-[4.125rem] shrink-0 items-center justify-center text-white/80 hover:text-white active:text-white transition-colors touch-manipulation"
+              data-cursor={magnifyActive ? undefined : "Close"}
+            >
+              <X size={33} aria-hidden strokeWidth={1.5} />
+            </button>
+          </div>
+
           <div ref={lensAreaRef} className="relative touch-none">
             <img
               ref={imgRef}
@@ -528,39 +563,6 @@ export function Lightbox({
           {index + 1} / {photos.length}
         </span>
       </div>
-
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (magnifyActive) cancelMagnify();
-          else activateMagnify();
-        }}
-        aria-label={magnifyActive ? "Cancel magnification" : "Magnify image"}
-        aria-pressed={magnifyActive}
-        className={`absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] start-4 sm:start-5 z-20 inline-flex h-[4.125rem] w-[4.125rem] items-center justify-center transition-colors touch-manipulation ${
-          magnifyActive
-            ? "text-red-500 pointer-events-none"
-            : "text-white/70 hover:text-white active:text-white"
-        }`}
-        data-cursor={magnifyActive ? undefined : "Magnify"}
-      >
-        <ZoomIn size={33} strokeWidth={1.5} />
-      </button>
-
-      <button
-        type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          if (magnifyActive) cancelMagnify();
-          else close();
-        }}
-        aria-label="Close"
-        className="absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] end-4 sm:end-5 z-20 interactive-target inline-flex h-11 w-11 items-center justify-center text-white/80 active:text-white transition-colors touch-manipulation"
-        data-cursor={magnifyActive ? undefined : "Close"}
-      >
-        <X size={22} aria-hidden />
-      </button>
 
       {photos.length > 1 && !magnifyActive && (
         <>
