@@ -219,14 +219,6 @@
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 0.88;
-  /* Mobile: 50% larger than desktop scale */
-  font-size: clamp(4.125rem, 16.5vw, 15rem);
-}
-
-@media (min-width: 640px) {
-  .wordmark {
-    font-size: clamp(2.75rem, 11vw, 15rem);
-  }
 }
 
 @utility page-title {

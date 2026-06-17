@@ -51,7 +51,7 @@ function GalleryPage() {
     <>
       {/* Hero wordmark */}
       <section className="site-container page-top pb-10 sm:pb-12 md:pb-20">
-        <h1 className="wordmark">
+        <h1 className="wordmark text-[clamp(4.125rem,16.5vw,15rem)] sm:text-[clamp(2.75rem,11vw,15rem)]">
           Man of
           <br />
           the Alps
