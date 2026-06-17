@@ -1,0 +1,527 @@
+{
+  "p01.webp": {
+    "title": "Snow Peaks",
+    "width": 2000,
+    "height": 1498
+  },
+  "p02.webp": {
+    "title": "Alpine Wing",
+    "width": 1500,
+    "height": 2000
+  },
+  "p04.webp": {
+    "title": "Window Valley",
+    "width": 1500,
+    "height": 2000
+  },
+  "p05.webp": {
+    "title": "Clouds from Above",
+    "width": 2000,
+    "height": 1500
+  },
+  "p06.webp": {
+    "title": "Golden Clouds",
+    "width": 2000,
+    "height": 1500
+  },
+  "p07.webp": {
+    "title": "Sticker Wall",
+    "width": 1500,
+    "height": 2000
+  },
+  "p08.webp": {
+    "title": "Green Arena",
+    "width": 2000,
+    "height": 1125
+  },
+  "p09.webp": {
+    "title": "Colosseum Flare",
+    "width": 2000,
+    "height": 1500
+  },
+  "p10.webp": {
+    "title": "Snow Umbrella",
+    "width": 2000,
+    "height": 1500
+  },
+  "p11.webp": {
+    "title": "Rain Glass",
+    "width": 1500,
+    "height": 2000
+  },
+  "p12.webp": {
+    "title": "Heavy Petal",
+    "tone": "bw",
+    "width": 2000,
+    "height": 1500
+  },
+  "p13.webp": {
+    "title": "Highway Fields",
+    "width": 1500,
+    "height": 2000
+  },
+  "p14.webp": {
+    "title": "Salt & Yeast",
+    "width": 2000,
+    "height": 2000
+  },
+  "p15.webp": {
+    "title": "Glyndwr Mosaic",
+    "width": 2000,
+    "height": 1500
+  },
+  "p16.webp": {
+    "title": "Window Glow",
+    "width": 2000,
+    "height": 1500
+  },
+  "p17.webp": {
+    "title": "Lamp Street",
+    "width": 1652,
+    "height": 2000
+  },
+  "p18.webp": {
+    "title": "Yellow Door",
+    "width": 1377,
+    "height": 2000
+  },
+  "p19.webp": {
+    "title": "Ivy Cottage",
+    "width": 1375,
+    "height": 2000
+  },
+  "p03.webp": {
+    "title": "City Dusk",
+    "width": 2000,
+    "height": 1500
+  },
+  "p20.webp": {
+    "title": "Manor Sky",
+    "width": 2000,
+    "height": 1500,
+    "tone": "bw"
+  },
+  "p21.webp": {
+    "title": "Vertical Forest",
+    "width": 2000,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p22.webp": {
+    "title": "Power Lines",
+    "width": 2000,
+    "height": 2000
+  },
+  "p23.webp": {
+    "title": "Neon Anemone",
+    "width": 1500,
+    "height": 2000
+  },
+  "p24.webp": {
+    "title": "Stone Arches",
+    "width": 1498,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p25.webp": {
+    "title": "Broken Facade",
+    "width": 2000,
+    "height": 1500
+  },
+  "p26.webp": {
+    "title": "Harbor Logs",
+    "width": 2000,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p27.webp": {
+    "title": "Handloom",
+    "width": 2000,
+    "height": 1500
+  },
+  "p28.webp": {
+    "title": "Green Valley",
+    "width": 1500,
+    "height": 2000
+  },
+  "p29.webp": {
+    "title": "Switchback Road",
+    "width": 2000,
+    "height": 1500
+  },
+  "p30.webp": {
+    "title": "Orange Bicycle",
+    "width": 2000,
+    "height": 1500
+  },
+  "p31.webp": {
+    "title": "Golden Wheat",
+    "width": 2000,
+    "height": 2000
+  },
+  "p32.webp": {
+    "title": "Terraced Quarry",
+    "width": 1500,
+    "height": 2000
+  },
+  "p33.webp": {
+    "title": "Arched Corridor",
+    "width": 1500,
+    "height": 2000
+  },
+  "p34.webp": {
+    "title": "Rain Gardeners",
+    "width": 2000,
+    "height": 1500
+  },
+  "p35.webp": {
+    "title": "Terracotta Yard",
+    "width": 2000,
+    "height": 1500
+  },
+  "p36.webp": {
+    "title": "Raised Hands",
+    "width": 2000,
+    "height": 1500
+  },
+  "p37.webp": {
+    "title": "Crowd Wave",
+    "width": 2000,
+    "height": 1500
+  },
+  "p38.webp": {
+    "title": "Turban Study",
+    "width": 1332,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p39.webp": {
+    "title": "Orange Turban",
+    "width": 2000,
+    "height": 2000
+  },
+  "p40.webp": {
+    "title": "Grain Portrait",
+    "width": 1332,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p41.webp": {
+    "title": "Sand Church",
+    "width": 1500,
+    "height": 2000
+  },
+  "p42.webp": {
+    "title": "Gilded Frame",
+    "width": 2000,
+    "height": 1500
+  },
+  "p43.webp": {
+    "title": "Midtown Dusk",
+    "width": 2000,
+    "height": 1500
+  },
+  "p44.webp": {
+    "title": "Mother and Child",
+    "width": 1334,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p45.webp": {
+    "title": "Graffiti Cart",
+    "width": 2000,
+    "height": 1500
+  },
+  "p46.webp": {
+    "title": "Underpass Bike",
+    "width": 2000,
+    "height": 1500
+  },
+  "p47.webp": {
+    "title": "Sailor Walk",
+    "width": 2000,
+    "height": 2000
+  },
+  "p48.webp": {
+    "title": "Cabin Glow",
+    "width": 2000,
+    "height": 1500
+  },
+  "p49.webp": {
+    "title": "Table Light",
+    "width": 2000,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p50.webp": {
+    "title": "Abandoned Car",
+    "width": 2000,
+    "height": 1498,
+    "tone": "bw"
+  },
+  "p51.webp": {
+    "title": "Sunlit Kitchen",
+    "width": 1500,
+    "height": 2000
+  },
+  "p52.webp": {
+    "title": "Tile Steps",
+    "width": 2000,
+    "height": 1611
+  },
+  "p53.webp": {
+    "title": "Cross Button",
+    "width": 2000,
+    "height": 1500
+  },
+  "p54.webp": {
+    "title": "Meter Box",
+    "width": 1498,
+    "height": 2000
+  },
+  "p55.webp": {
+    "title": "Laser Arena",
+    "width": 2000,
+    "height": 1500
+  },
+  "p56.webp": {
+    "title": "Carver Bench",
+    "width": 2000,
+    "height": 1498
+  },
+  "p57.webp": {
+    "title": "Confetti Night",
+    "width": 2000,
+    "height": 1500
+  },
+  "p58.webp": {
+    "title": "Tagged Kiosk",
+    "width": 2000,
+    "height": 1498,
+    "tone": "bw"
+  },
+  "p59.webp": {
+    "title": "Round Window",
+    "width": 2000,
+    "height": 1500,
+    "tone": "bw"
+  },
+  "p60.webp": {
+    "title": "Carved Door",
+    "width": 1500,
+    "height": 2000
+  },
+  "p61.webp": {
+    "title": "Marble Walk",
+    "width": 2000,
+    "height": 2000
+  },
+  "p62.webp": {
+    "title": "Saree Circle",
+    "width": 1998,
+    "height": 2000
+  },
+  "p63.webp": {
+    "title": "Taj Minaret",
+    "width": 2000,
+    "height": 1125
+  },
+  "p64.webp": {
+    "title": "Twin Pines",
+    "width": 1500,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p65.webp": {
+    "title": "Bench Umbrella",
+    "width": 2000,
+    "height": 1332,
+    "tone": "bw"
+  },
+  "p66.webp": {
+    "title": "Light on Habits",
+    "width": 2000,
+    "height": 1332,
+    "tone": "bw"
+  },
+  "p67.webp": {
+    "title": "Arched Courtyard",
+    "width": 2000,
+    "height": 1332,
+    "tone": "bw"
+  },
+  "p68.webp": {
+    "title": "Cargo Rider",
+    "width": 2000,
+    "height": 1510,
+    "tone": "bw"
+  },
+  "p69.webp": {
+    "title": "Wire Alley",
+    "width": 1332,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p70.webp": {
+    "title": "Chandni Chowk",
+    "width": 2000,
+    "height": 1332
+  },
+  "p71.webp": {
+    "title": "Red Uniforms",
+    "width": 2000,
+    "height": 2000
+  },
+  "p72.webp": {
+    "title": "Mortimer Sunset",
+    "width": 1551,
+    "height": 2000
+  },
+  "p73.webp": {
+    "title": "Colosseum Floor",
+    "width": 2000,
+    "height": 1516
+  },
+  "p74.webp": {
+    "title": "Sticker Ashtray",
+    "width": 2000,
+    "height": 1498,
+    "tone": "bw"
+  },
+  "p75.webp": {
+    "title": "Red Velvet",
+    "width": 1500,
+    "height": 2000
+  },
+  "p76.webp": {
+    "title": "Canal Street",
+    "width": 1500,
+    "height": 2000
+  },
+  "p77.webp": {
+    "title": "Polizia Circle",
+    "width": 2000,
+    "height": 2000
+  },
+  "p78.webp": {
+    "title": "Atlas Moth",
+    "width": 2000,
+    "height": 1500
+  },
+  "p79.webp": {
+    "title": "Vine Wall",
+    "width": 1500,
+    "height": 2000
+  },
+  "p80.webp": {
+    "title": "Final Stretch",
+    "width": 2000,
+    "height": 1500
+  },
+  "p81.webp": {
+    "title": "Sleeping Rider",
+    "width": 1500,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p82.webp": {
+    "title": "Ice Cave",
+    "width": 2000,
+    "height": 1500,
+    "tone": "bw"
+  },
+  "p83.webp": {
+    "title": "Amber Frost",
+    "width": 2000,
+    "height": 1500
+  },
+  "p84.webp": {
+    "title": "Ice Explorers",
+    "width": 2000,
+    "height": 1125
+  },
+  "p85.webp": {
+    "title": "Sunbeam Valley",
+    "width": 1500,
+    "height": 2000
+  },
+  "p86.webp": {
+    "title": "Mountain Window",
+    "width": 2000,
+    "height": 2000
+  },
+  "p87.webp": {
+    "title": "Brick Tunnel",
+    "width": 1332,
+    "height": 2000
+  },
+  "p88.webp": {
+    "title": "Green Valley",
+    "width": 2000,
+    "height": 1119
+  },
+  "p89.webp": {
+    "title": "Tube Approach",
+    "width": 2000,
+    "height": 2000
+  },
+  "p90.webp": {
+    "title": "Winding Pass",
+    "width": 2000,
+    "height": 1497
+  },
+  "p91.webp": {
+    "title": "Liberty Sunset",
+    "width": 2000,
+    "height": 1500
+  },
+  "p92.webp": {
+    "title": "Pink Sky",
+    "width": 2000,
+    "height": 1500
+  },
+  "p93.webp": {
+    "title": "Facade Workers",
+    "width": 1500,
+    "height": 2000
+  },
+  "p94.webp": {
+    "title": "Torch Silhouette",
+    "width": 1500,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p95.webp": {
+    "title": "Rain Glass",
+    "width": 2000,
+    "height": 1500,
+    "tone": "bw"
+  },
+  "p96.webp": {
+    "title": "Wing at Sunset",
+    "width": 2000,
+    "height": 1500
+  },
+  "p97.webp": {
+    "title": "River Mirror",
+    "width": 1428,
+    "height": 2000,
+    "tone": "bw"
+  },
+  "p98.webp": {
+    "title": "Feather and Bone",
+    "width": 2000,
+    "height": 1500,
+    "tone": "bw"
+  },
+  "p99.webp": {
+    "title": "Vintage Lounge",
+    "width": 2000,
+    "height": 1500
+  },
+  "p100.webp": {
+    "title": "Night Cabin",
+    "width": 1500,
+    "height": 2000
+  }
+}

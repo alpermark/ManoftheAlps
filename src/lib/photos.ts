@@ -223,13 +223,17 @@ const entries = Object.entries(imageModules)
   });
 
 export const photos: Photo[] = moveToIndex(
-  swapById(
-    pinFeaturedFirst(spreadGallery(entries)),
-    "batch03-p24",
-    "batch06-p62",
+  moveToIndex(
+    swapById(
+      pinFeaturedFirst(spreadGallery(entries)),
+      "batch03-p24",
+      "batch06-p62",
+    ),
+    "batch03-p48",
+    130,
   ),
-  "batch03-p48",
-  130,
+  "batch09-p37",
+  20,
 );
 
 export const subjects: Subject[] = [

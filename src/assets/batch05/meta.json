@@ -21,13 +21,19 @@
     "title": "Branches in White"
   },
   "p08.webp": {
-    "title": "Inner Chorus"
+    "title": "Inner Chorus",
+    "tone": "bw",
+    "width": 1500,
+    "height": 2000
   },
   "p09.webp": {
     "title": "Stairwell Dark"
   },
   "p10.webp": {
-    "title": "Arched Silence"
+    "title": "Arched Silence",
+    "tone": "bw",
+    "width": 1500,
+    "height": 2000
   },
   "p11.webp": {
     "title": "Rocking in Red"
@@ -87,7 +93,10 @@
     "title": "Frame Without Glass"
   },
   "p30.webp": {
-    "title": "Silhouettes at Exit"
+    "title": "Silhouettes at Exit",
+    "tone": "bw",
+    "width": 2000,
+    "height": 2000
   },
   "p31.webp": {
     "title": "Whale's Goodbye"

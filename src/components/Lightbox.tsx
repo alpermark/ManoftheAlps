@@ -10,12 +10,23 @@ interface Props {
   getRect: (i: number) => DOMRect | null;
 }
 
-export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Props) {
+export function Lightbox({
+  photos,
+  index,
+  onIndexChange,
+  onClose,
+  getRect,
+}: Props) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [closing, setClosing] = useState(false);
   const [backdropIn, setBackdropIn] = useState(false);
   const [dragX, setDragX] = useState(0);
-  const dragState = useRef<{ active: boolean; startX: number; startY: number; locked: boolean }>({
+  const dragState = useRef<{
+    active: boolean;
+    startX: number;
+    startY: number;
+    locked: boolean;
+  }>({
     active: false,
     startX: 0,
     startY: 0,
@@ -23,6 +34,7 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
   });
 
   const photo = photos[index];
+  const flipDone = useRef(false);
 
   // Body scroll lock
   useEffect(() => {
@@ -44,8 +56,10 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
     (i: number) => {
       const el = imgRef.current;
       const rect = getRect(i);
-      if (!el || !rect) return;
+      if (!el || !rect || flipDone.current) return;
       const target = el.getBoundingClientRect();
+      if (target.width <= 0 || target.height <= 0) return;
+      flipDone.current = true;
       const dx = rect.left + rect.width / 2 - (target.left + target.width / 2);
       const dy = rect.top + rect.height / 2 - (target.top + target.height / 2);
       const sx = rect.width / target.width;
@@ -56,12 +70,17 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
       el.style.opacity = "0.6";
       // force reflow
       void el.offsetWidth;
-      el.style.transition = "transform 520ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 320ms ease";
+      el.style.transition =
+        "transform 520ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 320ms ease";
       el.style.transform = "translate(0,0) scale(1)";
       el.style.opacity = "1";
     },
     [getRect],
   );
+
+  const handleImageLoad = useCallback(() => {
+    animateFromThumb(index);
+  }, [animateFromThumb, index]);
 
   const close = useCallback(() => {
     const el = imgRef.current;
@@ -75,7 +94,8 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
       const sx = rect.width / target.width;
       const sy = rect.height / target.height;
       const s = Math.max(sx, sy);
-      el.style.transition = "transform 460ms cubic-bezier(0.4, 0, 0.2, 1), opacity 360ms ease";
+      el.style.transition =
+        "transform 460ms cubic-bezier(0.4, 0, 0.2, 1), opacity 360ms ease";
       el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
       el.style.opacity = "0";
     }
@@ -123,7 +143,12 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
   // Drag / swipe
   const onPointerDown = (e: React.PointerEvent) => {
     if (closing) return;
-    dragState.current = { active: true, startX: e.clientX, startY: e.clientY, locked: false };
+    dragState.current = {
+      active: true,
+      startX: e.clientX,
+      startY: e.clientY,
+      locked: false,
+    };
     (e.target as Element).setPointerCapture?.(e.pointerId);
   };
   const onPointerMove = (e: React.PointerEvent) => {
@@ -182,7 +207,11 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
           ref={imgRef}
           src={photo.src}
           alt={photo.title}
+          {...(photo.width > 0 && photo.height > 0
+            ? { width: photo.width, height: photo.height }
+            : {})}
           draggable={false}
+          onLoad={handleImageLoad}
           onClick={(e) => {
             e.stopPropagation();
             close();
@@ -191,13 +220,13 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
             transform: dragX ? `translateX(${dragX}px)` : undefined,
             transition: dragX ? "none" : undefined,
           }}
-          className="max-w-[92vw] max-h-[86vh] object-contain cursor-zoom-out"
+          className="max-w-[92vw] max-h-[86vh] w-auto h-auto object-contain cursor-zoom-out"
           data-cursor="Close"
         />
       </div>
 
       {/* Caption */}
-      <div className="absolute bottom-6 left-0 right-0 z-20 text-center pointer-events-none">
+      <div className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom,0px))] inset-x-0 z-20 px-4 text-center pointer-events-none">
         <span className="nav-label text-white/80">
           {photo.title}
           <span className="opacity-50 mx-2">/</span>
@@ -207,38 +236,41 @@ export function Lightbox({ photos, index, onIndexChange, onClose, getRect }: Pro
 
       {/* Close */}
       <button
+        type="button"
         onClick={close}
         aria-label="Close"
-        className="absolute top-5 right-5 z-20 p-3 text-white/80 hover:text-white transition-colors"
+        className="absolute top-[max(1.25rem,env(safe-area-inset-top,0px))] end-4 sm:end-5 z-20 interactive-target inline-flex items-center justify-center text-white/80 hover:text-white transition-colors"
         data-cursor="Close"
       >
-        <X size={22} />
+        <X size={22} aria-hidden />
       </button>
 
       {/* Arrows */}
       {photos.length > 1 && (
         <>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               go(-1);
             }}
             aria-label="Previous"
-            className="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 z-20 p-3 text-white/70 hover:text-white transition-colors"
+            className="absolute start-1 sm:start-4 md:start-6 top-1/2 -translate-y-1/2 z-20 interactive-target inline-flex items-center justify-center text-white/70 hover:text-white transition-colors"
             data-cursor="Prev"
           >
-            <ChevronLeft size={36} />
+            <ChevronLeft size={32} aria-hidden className="sm:w-9 sm:h-9" />
           </button>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               go(1);
             }}
             aria-label="Next"
-            className="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 z-20 p-3 text-white/70 hover:text-white transition-colors"
+            className="absolute end-1 sm:end-4 md:end-6 top-1/2 -translate-y-1/2 z-20 interactive-target inline-flex items-center justify-center text-white/70 hover:text-white transition-colors"
             data-cursor="Next"
           >
-            <ChevronRight size={36} />
+            <ChevronRight size={32} aria-hidden className="sm:w-9 sm:h-9" />
           </button>
         </>
       )}
