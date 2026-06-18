@@ -12,18 +12,16 @@ import { type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { SiteHeader } from "../components/SiteHeader";
 import { CustomCursor } from "../components/CustomCursor";
-import {
-  SITE_DESCRIPTION,
-  SITE_NAME,
-  SITE_TITLE,
-  OG_DESCRIPTION,
-  THEME_COLOR,
-  absoluteUrl,
-  siteUrl,
-} from "../lib/site-meta";
 
-const OG_IMAGE = absoluteUrl("/og-image.png");
-const CANONICAL_URL = siteUrl() || undefined;
+const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(
+  /\/$/,
+  "",
+) ?? "";
+const SITE_TITLE = "Man of the Alps - Photography";
+const SITE_DESCRIPTION =
+  "Travel photography by Man of the Alps. Cities, people, and moments collected on the road.";
+const OG_IMAGE = SITE_URL ? `${SITE_URL}/og-image.png` : "/og-image.png";
+const OG_URL = SITE_URL || undefined;
 
 function NotFoundComponent() {
   return (
@@ -90,39 +88,32 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { charSet: "utf-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1" },
         { title: SITE_TITLE },
-        {
-          name: "description",
-          content: SITE_DESCRIPTION,
-        },
-        { name: "author", content: SITE_NAME },
+        { name: "description", content: SITE_DESCRIPTION },
+        { name: "author", content: "Man of the Alps" },
         { property: "og:title", content: SITE_TITLE },
-        {
-          property: "og:description",
-          content: OG_DESCRIPTION,
-        },
+        { property: "og:description", content: SITE_DESCRIPTION },
         { property: "og:type", content: "website" },
-        { property: "og:site_name", content: SITE_NAME },
-        ...(CANONICAL_URL
-          ? [{ property: "og:url", content: CANONICAL_URL }]
-          : []),
+        { property: "og:site_name", content: "Man of the Alps" },
+        ...(OG_URL ? [{ property: "og:url", content: OG_URL }] : []),
         { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:type", content: "image/png" },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "1200" },
-        { property: "og:image:alt", content: SITE_NAME },
+        { property: "og:image:alt", content: "Man of the Alps" },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:title", content: SITE_TITLE },
-        { name: "twitter:description", content: OG_DESCRIPTION },
+        { name: "twitter:description", content: SITE_DESCRIPTION },
         { name: "twitter:image", content: OG_IMAGE },
-        { name: "twitter:image:alt", content: SITE_NAME },
-        { name: "theme-color", content: THEME_COLOR },
-        { name: "apple-mobile-web-app-title", content: SITE_NAME },
+        { name: "twitter:image:alt", content: "Man of the Alps" },
+        { name: "theme-color", content: "#26221f" },
+        { name: "apple-mobile-web-app-title", content: "Man of the Alps" },
         { name: "apple-mobile-web-app-capable", content: "yes" },
       ],
       links: [
-        ...(CANONICAL_URL ? [{ rel: "canonical", href: CANONICAL_URL }] : []),
         { rel: "stylesheet", href: appCss },
-        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        ...(OG_URL ? [{ rel: "canonical", href: OG_URL }] : []),
         { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
         {
           rel: "icon",
           href: "/favicon-32x32.png",

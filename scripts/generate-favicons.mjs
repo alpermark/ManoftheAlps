@@ -8,6 +8,12 @@ const FONT_PATH = path.join(ROOT, "scripts/fonts/CormorantGaramond-Medium.ttf");
 const FONT_URL =
   "https://raw.githubusercontent.com/google/fonts/main/ofl/cormorantgaramond/CormorantGaramond%5Bwght%5D.ttf";
 
+/** Brand tokens from src/styles.css */
+const INK = "#26221f"; // oklch(0.16 0.012 60)
+const PAPER = "#f3ede6"; // oklch(0.962 0.012 85)
+const CORNER_RATIO = 0.1875; // ~iOS-style rounded square
+const LETTER_RATIO = 0.84; // M fills most of the square, with a small margin
+
 async function ensureFont() {
   if (fs.existsSync(FONT_PATH)) return;
   fs.mkdirSync(path.dirname(FONT_PATH), { recursive: true });
@@ -16,73 +22,54 @@ async function ensureFont() {
   fs.writeFileSync(FONT_PATH, Buffer.from(await res.arrayBuffer()));
 }
 
-/** Brand tokens from src/styles.css */
-const INK = "#26221f"; // oklch(0.16 0.012 60)
-const PAPER = "#f3ede6"; // oklch(0.962 0.012 85)
+function buildSvgMarkup(size, { embedFont = true } = {}) {
+  const radius = Math.round(size * CORNER_RATIO);
+  const fontSize = Math.round(size * LETTER_RATIO);
+  const letterSpacing = (-0.01 * fontSize).toFixed(1);
 
-function buildSvg(size, fontBase64) {
-  const fontSize = Math.round(size * 0.78);
-  const y = Math.round(size * 0.68);
-
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <defs>
-    <style>
+  const fontFace = embedFont
+    ? `<style>
       @font-face {
         font-family: "Cormorant Garamond";
-        src: url("data:font/truetype;charset=utf-8;base64,${fontBase64}") format("truetype");
+        src: url("data:font/truetype;charset=utf-8;base64,${fs
+          .readFileSync(FONT_PATH)
+          .toString("base64")}") format("truetype");
         font-weight: 500;
         font-style: normal;
       }
-    </style>
-  </defs>
-  <rect width="${size}" height="${size}" fill="${INK}"/>
+    </style>`
+    : `<style>
+      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;display=swap");
+    </style>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+  <defs>${fontFace}</defs>
+  <rect width="${size}" height="${size}" rx="${radius}" ry="${radius}" fill="${INK}"/>
   <text
     x="50%"
-    y="${y}"
+    y="50%"
     text-anchor="middle"
+    dominant-baseline="central"
     fill="${PAPER}"
     font-family="Cormorant Garamond, Times New Roman, serif"
     font-size="${fontSize}"
     font-weight="500"
-    letter-spacing="${(-0.01 * fontSize).toFixed(1)}"
+    letter-spacing="${letterSpacing}"
   >M</text>
-</svg>`);
+</svg>`;
 }
 
 async function writePng(svg, outPath, size) {
-  await sharp(svg).resize(size, size).png().toFile(outPath);
-}
-
-async function writeSvg(outPath, size = 512) {
-  const fontSize = Math.round(size * 0.78);
-  const y = Math.round(size * 0.68);
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <defs>
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;display=swap");
-    </style>
-  </defs>
-  <rect width="${size}" height="${size}" fill="${INK}"/>
-  <text
-    x="50%"
-    y="${y}"
-    text-anchor="middle"
-    fill="${PAPER}"
-    font-family="Cormorant Garamond, Times New Roman, serif"
-    font-size="${fontSize}"
-    font-weight="500"
-    letter-spacing="${(-0.01 * fontSize).toFixed(1)}"
-  >M</text>
-</svg>`;
-  fs.writeFileSync(outPath, svg);
+  await sharp(Buffer.from(svg)).resize(size, size).png().toFile(outPath);
 }
 
 async function main() {
   await ensureFont();
-  const fontBase64 = fs.readFileSync(FONT_PATH).toString("base64");
-  const svg512 = buildSvg(512, fontBase64);
 
-  await writeSvg(path.join(PUBLIC, "favicon.svg"));
+  const svg512 = buildSvgMarkup(512, { embedFont: true });
+  const svgPublic = buildSvgMarkup(512, { embedFont: false });
+
+  fs.writeFileSync(path.join(PUBLIC, "favicon.svg"), svgPublic);
   await writePng(svg512, path.join(PUBLIC, "icon-512.png"), 512);
   await writePng(svg512, path.join(PUBLIC, "icon-192.png"), 192);
   await writePng(svg512, path.join(PUBLIC, "apple-touch-icon.png"), 180);
@@ -90,10 +77,11 @@ async function main() {
   await writePng(svg512, path.join(PUBLIC, "favicon-16x16.png"), 16);
   await writePng(svg512, path.join(PUBLIC, "og-image.png"), 1200);
 
-  // Multi-size ICO for legacy browsers / some crawlers.
   const icoSizes = [16, 32, 48];
   const icoImages = await Promise.all(
-    icoSizes.map((size) => sharp(svg512).resize(size, size).png().toBuffer()),
+    icoSizes.map((size) =>
+      sharp(Buffer.from(svg512)).resize(size, size).png().toBuffer(),
+    ),
   );
   fs.writeFileSync(
     path.join(PUBLIC, "favicon.ico"),
