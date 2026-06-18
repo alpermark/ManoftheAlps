@@ -8,9 +8,14 @@ const LIGHTBOX_ICON_SIZE = 33;
 const LIGHTBOX_ICON_BTN = "h-[4.125rem] w-[4.125rem]";
 const MOBILE_LENS_SCALE = 2.8;
 const SWIPE_THRESHOLD = 70;
-const SLIDE_OUT_MS = 320;
-const FADE_OUT_MS = 320;
-const FADE_IN_MS = 360;
+const CROSSFADE_MS = 1000;
+const CROSSFADE_EASE = "ease-in-out";
+
+const centerTransform = (dragOffset = 0) =>
+  `translate(calc(-50% + ${dragOffset}px), -50%)`;
+
+const thumbTransform = (dx: number, dy: number, scale = 1) =>
+  `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(${scale})`;
 
 function isTouchLikeDevice() {
   if (typeof window === "undefined") return false;
@@ -101,11 +106,16 @@ export function Lightbox({
   const magnifyActiveRef = useRef(false);
   const closeRef = useRef<() => void>(() => {});
   const flipDone = useRef(false);
+  const skipThumbAnim = useRef(false);
+  const navFinishingRef = useRef(false);
 
   const photo = photos[index];
   const showNav = photos.length > 1 && !magnifyActive;
 
-  const imgClass = `block w-auto h-auto object-contain touch-manipulation max-w-[calc(100vw-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px))] max-h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-4.125rem)] md:max-w-[min(92vw,calc(100vw-10.5rem))] md:max-h-[calc(86vh-5.5rem)] ${
+  const stageClass =
+    "relative w-full min-w-0 overflow-hidden touch-none max-w-[calc(100vw-env(safe-area-inset-left,0px)-env(safe-area-inset-right,0px))] h-[calc(100dvh-env(safe-area-inset-top,0px)-env(safe-area-inset-bottom,0px)-4.125rem)] md:max-w-[min(92vw,calc(100vw-10.5rem))] md:h-[calc(86vh-5.5rem)]";
+
+  const layeredImgClass = `absolute left-1/2 top-1/2 block max-w-full max-h-full w-auto h-auto object-contain touch-manipulation ${
     !magnifyActive && !navTransition ? "cursor-zoom-out" : ""
   } ${magnifyActive ? "cursor-none" : ""}`;
 
@@ -119,6 +129,9 @@ export function Lightbox({
 
   const finishNav = useCallback(
     (transition: NavTransition) => {
+      if (navFinishingRef.current) return;
+      navFinishingRef.current = true;
+
       if (navTimer.current !== null) {
         window.clearTimeout(navTimer.current);
         navTimer.current = null;
@@ -126,6 +139,7 @@ export function Lightbox({
       setNavTransition(null);
       setNavAnimating(false);
       setDragPx(0);
+      skipThumbAnim.current = true;
       onIndexChange(transition.toIndex);
     },
     [onIndexChange],
@@ -142,10 +156,11 @@ export function Lightbox({
       setNavAnimating(false);
       setDragPx(0);
       navAnimStarted.current = false;
+      navFinishingRef.current = false;
 
       navTimer.current = window.setTimeout(() => {
         finishNav(transition);
-      }, Math.max(SLIDE_OUT_MS, FADE_IN_MS) + 40);
+      }, CROSSFADE_MS + 64);
     },
     [finishNav, index, navTransition, photos.length],
   );
@@ -155,25 +170,29 @@ export function Lightbox({
 
     const incoming = photos[navTransition.toIndex];
     const preload = new Image();
+    preload.decoding = "sync";
     preload.src = incoming.src;
 
+    const beginFade = () => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => startNavAnimation());
+      });
+    };
+
     if (preload.complete) {
-      startNavAnimation();
+      beginFade();
     } else {
-      preload.onload = () => startNavAnimation();
-      preload.onerror = () => startNavAnimation();
+      preload.onload = beginFade;
+      preload.onerror = beginFade;
     }
 
-    const fallback = window.setTimeout(() => startNavAnimation(), 80);
+    const fallback = window.setTimeout(beginFade, 120);
     return () => window.clearTimeout(fallback);
   }, [navTransition, photos, startNavAnimation]);
 
-  const onOutgoingTransitionEnd = useCallback(
+  const onNavTransitionEnd = useCallback(
     (e: React.TransitionEvent) => {
-      if (!navTransition) return;
-      const prop =
-        navTransition.delta > 0 ? "opacity" : "transform";
-      if (e.propertyName !== prop) return;
+      if (!navTransition || e.propertyName !== "opacity") return;
       finishNav(navTransition);
     },
     [finishNav, navTransition],
@@ -438,12 +457,17 @@ export function Lightbox({
   }, []);
 
   const animateFromThumb = useCallback(
-    (i: number) => {
+    (i: number, attempt = 0) => {
       const el = imgRef.current;
       const rect = getRect(i);
       if (!el || !rect || flipDone.current) return;
       const target = el.getBoundingClientRect();
-      if (target.width <= 0 || target.height <= 0) return;
+      if (target.width <= 0 || target.height <= 0) {
+        if (attempt < 8) {
+          requestAnimationFrame(() => animateFromThumb(i, attempt + 1));
+        }
+        return;
+      }
       flipDone.current = true;
       const dx = rect.left + rect.width / 2 - (target.left + target.width / 2);
       const dy = rect.top + rect.height / 2 - (target.top + target.height / 2);
@@ -451,18 +475,30 @@ export function Lightbox({
       const sy = rect.height / target.height;
       const s = Math.max(sx, sy);
       el.style.transition = "none";
-      el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
+      el.style.transform = thumbTransform(dx, dy, s);
       el.style.opacity = "0.6";
       void el.offsetWidth;
       el.style.transition =
-        "transform 520ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 320ms ease";
-      el.style.transform = "translate(0,0) scale(1)";
+        "transform 520ms cubic-bezier(0.2, 0.7, 0.1, 1), opacity 520ms ease";
+      el.style.transform = centerTransform();
       el.style.opacity = "1";
+      const onOpenTransitionEnd = (e: TransitionEvent) => {
+        if (e.propertyName !== "transform") return;
+        el.removeEventListener("transitionend", onOpenTransitionEnd);
+        el.style.transition = "";
+        el.style.transform = centerTransform();
+        el.style.opacity = "";
+      };
+      el.addEventListener("transitionend", onOpenTransitionEnd);
     },
     [getRect],
   );
 
   const handleImageLoad = useCallback(() => {
+    if (skipThumbAnim.current) {
+      skipThumbAnim.current = false;
+      return;
+    }
     animateFromThumb(index);
   }, [animateFromThumb, index]);
 
@@ -481,7 +517,7 @@ export function Lightbox({
       const s = Math.max(sx, sy);
       el.style.transition =
         "transform 460ms cubic-bezier(0.4, 0, 0.2, 1), opacity 360ms ease";
-      el.style.transform = `translate(${dx}px, ${dy}px) scale(${s})`;
+      el.style.transform = thumbTransform(dx, dy, s);
       el.style.opacity = "0";
     }
     window.setTimeout(onClose, 480);
@@ -579,8 +615,11 @@ export function Lightbox({
     close();
   };
 
+  const crossfadeTransition = navAnimating
+    ? `opacity ${CROSSFADE_MS}ms ${CROSSFADE_EASE}`
+    : "none";
+
   const incomingPhoto = navTransition ? photos[navTransition.toIndex] : null;
-  const isNextNav = navTransition?.delta === 1;
 
   const photoDims = (p: Photo) =>
     p.width > 0 && p.height > 0
@@ -683,7 +722,7 @@ export function Lightbox({
         style={{ touchAction: "none" }}
       >
         <div
-          className="relative flex w-fit max-w-full md:max-w-[92vw] flex-col"
+          className="relative flex w-full max-w-full md:max-w-[92vw] flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="fixed inset-x-0 top-0 z-20 mb-0 flex items-center justify-between px-2 pt-[env(safe-area-inset-top,0px)] md:relative md:inset-auto md:mb-2 md:px-0 md:pt-0">
@@ -721,82 +760,60 @@ export function Lightbox({
             </button>
           </div>
 
-          <div
-            ref={lensAreaRef}
-            className="relative w-fit min-w-0 overflow-hidden touch-none"
-          >
-                {navTransition && incomingPhoto ? (
-                  <>
-                    <img
-                      src={incomingPhoto.src}
-                      alt=""
-                      aria-hidden
-                      draggable={false}
-                      {...photoDims(incomingPhoto)}
-                      className={`${imgClass} invisible`}
-                    />
-                    <img
-                      src={incomingPhoto.src}
-                      alt={incomingPhoto.title}
-                      draggable={false}
-                      {...photoDims(incomingPhoto)}
-                      className={`${imgClass} absolute inset-0 m-auto`}
-                      style={{
-                        opacity: navAnimating ? 1 : 0,
-                        transition: navAnimating
-                          ? `opacity ${FADE_IN_MS}ms ease`
-                          : "none",
-                      }}
-                    />
-                    <img
-                      ref={imgRef}
-                      src={photos[navTransition.fromIndex].src}
-                      alt={photos[navTransition.fromIndex].title}
-                      {...photoDims(photos[navTransition.fromIndex])}
-                      draggable={false}
-                      onTransitionEnd={onOutgoingTransitionEnd}
-                      className={`${imgClass} absolute left-1/2 top-1/2`}
-                      style={{
-                        transform: isNextNav
-                          ? "translate(-50%, -50%)"
-                          : navAnimating
-                            ? "translate(calc(-50% + 100%), -50%)"
-                            : "translate(-50%, -50%)",
-                        ...(isNextNav
-                          ? {
-                              opacity: navAnimating ? 0 : 1,
-                              transition: navAnimating
-                                ? `opacity ${FADE_OUT_MS}ms ease`
-                                : "none",
-                            }
-                          : {
-                              transition: navAnimating
-                                ? `transform ${SLIDE_OUT_MS}ms cubic-bezier(0.2, 0.7, 0.1, 1)`
-                                : "none",
-                            }),
-                      }}
-                    />
-                  </>
-                ) : (
-                  <img
-                    ref={imgRef}
-                    src={photo.src}
-                    alt={photo.title}
-                    {...photoDims(photo)}
-                    draggable={false}
-                    onLoad={handleImageLoad}
-                    onClick={(e) => {
-                      if (isTouchLike) return;
-                      handleImageTap(e);
-                    }}
-                    style={{
-                      transform: dragPx ? `translateX(${dragPx}px)` : undefined,
-                      transition: dragPx ? "none" : undefined,
-                    }}
-                    className={imgClass}
-                    data-cursor={!magnifyActive ? "Close" : undefined}
-                  />
-                )}
+          <div ref={lensAreaRef} className={stageClass}>
+            {navTransition && incomingPhoto ? (
+              <>
+                <img
+                  src={photos[navTransition.fromIndex].src}
+                  alt={photos[navTransition.fromIndex].title}
+                  {...photoDims(photos[navTransition.fromIndex])}
+                  draggable={false}
+                  decoding="sync"
+                  className={`${layeredImgClass} z-0 pointer-events-none`}
+                  style={{
+                    transform: centerTransform(),
+                    opacity: navAnimating ? 0 : 1,
+                    transition: crossfadeTransition,
+                    willChange: navAnimating ? "opacity" : undefined,
+                  }}
+                />
+                <img
+                  ref={imgRef}
+                  src={incomingPhoto.src}
+                  alt={incomingPhoto.title}
+                  draggable={false}
+                  decoding="sync"
+                  onTransitionEnd={onNavTransitionEnd}
+                  {...photoDims(incomingPhoto)}
+                  className={`${layeredImgClass} z-10 pointer-events-none`}
+                  style={{
+                    transform: centerTransform(),
+                    opacity: navAnimating ? 1 : 0,
+                    transition: crossfadeTransition,
+                    willChange: navAnimating ? "opacity" : undefined,
+                  }}
+                />
+              </>
+            ) : (
+              <img
+                ref={imgRef}
+                src={photo.src}
+                alt={photo.title}
+                {...photoDims(photo)}
+                draggable={false}
+                onLoad={handleImageLoad}
+                onClick={(e) => {
+                  if (isTouchLike) return;
+                  handleImageTap(e);
+                }}
+                style={{
+                  transform: centerTransform(dragPx),
+                  transition: dragPx ? "none" : undefined,
+                }}
+                className={layeredImgClass}
+                data-cursor={!magnifyActive ? "Close" : undefined}
+              />
+            )}
 
                 {magnifyActive && lens && !navTransition && (
                   <div
