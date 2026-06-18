@@ -20,9 +20,7 @@ async function ensureFont() {
 const INK = "#26221f"; // oklch(0.16 0.012 60)
 const PAPER = "#f3ede6"; // oklch(0.962 0.012 85)
 
-const fontBase64 = fs.readFileSync(FONT_PATH).toString("base64");
-
-function buildSvg(size) {
+function buildSvg(size, fontBase64) {
   const fontSize = Math.round(size * 0.78);
   const y = Math.round(size * 0.68);
 
@@ -81,7 +79,8 @@ async function writeSvg(outPath, size = 512) {
 
 async function main() {
   await ensureFont();
-  const svg512 = buildSvg(512);
+  const fontBase64 = fs.readFileSync(FONT_PATH).toString("base64");
+  const svg512 = buildSvg(512, fontBase64);
 
   await writeSvg(path.join(PUBLIC, "favicon.svg"));
   await writePng(svg512, path.join(PUBLIC, "icon-512.png"), 512);
