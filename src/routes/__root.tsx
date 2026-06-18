@@ -13,6 +13,12 @@ import appCss from "../styles.css?url";
 import { SiteHeader } from "../components/SiteHeader";
 import { CustomCursor } from "../components/CustomCursor";
 
+const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(
+  /\/$/,
+  "",
+) ?? "";
+const OG_IMAGE = SITE_URL ? `${SITE_URL}/og-image.png` : "/og-image.png";
+
 function NotFoundComponent() {
   return (
     <div className="site-container page-top page-bottom flex min-h-dvh items-center justify-center">
@@ -91,10 +97,38 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         },
         { property: "og:type", content: "website" },
         { property: "og:site_name", content: "Man of the Alps" },
-        { name: "twitter:card", content: "summary_large_image" },
+        { property: "og:image", content: OG_IMAGE },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "1200" },
+        { property: "og:image:alt", content: "Man of the Alps" },
+        { name: "twitter:card", content: "summary" },
+        { name: "twitter:image", content: OG_IMAGE },
+        { name: "twitter:image:alt", content: "Man of the Alps" },
+        { name: "theme-color", content: "#26221f" },
+        { name: "apple-mobile-web-app-title", content: "Man of the Alps" },
       ],
       links: [
         { rel: "stylesheet", href: appCss },
+        { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+        { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+        {
+          rel: "icon",
+          href: "/favicon-32x32.png",
+          sizes: "32x32",
+          type: "image/png",
+        },
+        {
+          rel: "icon",
+          href: "/favicon-16x16.png",
+          sizes: "16x16",
+          type: "image/png",
+        },
+        {
+          rel: "apple-touch-icon",
+          href: "/apple-touch-icon.png",
+          sizes: "180x180",
+        },
+        { rel: "manifest", href: "/site.webmanifest" },
         { rel: "preconnect", href: "https://fonts.googleapis.com" },
         {
           rel: "preconnect",
