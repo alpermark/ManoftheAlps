@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <defs><style>
-      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;display=swap");
-    </style></defs>
-  <rect width="512" height="512" rx="96" ry="96" fill="#26221f"/>
+  <defs>
+    <style>@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap");</style>
+  </defs>
+  <rect width="512" height="512" rx="92" ry="92" fill="#26221f"/>
   <text
     x="50%"
     y="50%"
@@ -10,8 +10,8 @@
     dominant-baseline="central"
     fill="#f3ede6"
     font-family="Cormorant Garamond, Times New Roman, serif"
-    font-size="430"
+    font-size="440"
     font-weight="500"
-    letter-spacing="-4.3"
+    letter-spacing="-4.4"
   >M</text>
 </svg>

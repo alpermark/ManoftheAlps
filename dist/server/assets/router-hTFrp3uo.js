@@ -165,9 +165,10 @@ function CustomCursor() {
 }
 //#endregion
 //#region src/routes/__root.tsx
+var OG_IMAGE = "/og-image.png";
 var SITE_TITLE = "Man of the Alps - Photography";
 var SITE_DESCRIPTION = "Travel photography by Man of the Alps. Cities, people, and moments collected on the road.";
-var OG_IMAGE = "/og-image.png";
+var OG_DESCRIPTION = "Travel photography - cities, people, and moments collected on the road.";
 function NotFoundComponent() {
 	return /* @__PURE__ */ jsx("div", {
 		className: "site-container page-top page-bottom flex min-h-dvh items-center justify-center",
@@ -257,7 +258,7 @@ var Route$3 = createRootRouteWithContext()({
 			},
 			{
 				property: "og:description",
-				content: SITE_DESCRIPTION
+				content: OG_DESCRIPTION
 			},
 			{
 				property: "og:type",
@@ -298,7 +299,7 @@ var Route$3 = createRootRouteWithContext()({
 			},
 			{
 				name: "twitter:description",
-				content: SITE_DESCRIPTION
+				content: OG_DESCRIPTION
 			},
 			{
 				name: "twitter:image",
@@ -326,16 +327,15 @@ var Route$3 = createRootRouteWithContext()({
 				rel: "stylesheet",
 				href: styles_default
 			},
-			...[],
-			{
-				rel: "icon",
-				href: "/favicon.svg",
-				type: "image/svg+xml"
-			},
 			{
 				rel: "icon",
 				href: "/favicon.ico",
 				sizes: "48x48"
+			},
+			{
+				rel: "icon",
+				href: "/favicon.svg",
+				type: "image/svg+xml"
 			},
 			{
 				rel: "icon",

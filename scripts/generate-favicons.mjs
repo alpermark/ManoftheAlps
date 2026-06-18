@@ -11,8 +11,6 @@ const FONT_URL =
 /** Brand tokens from src/styles.css */
 const INK = "#26221f"; // oklch(0.16 0.012 60)
 const PAPER = "#f3ede6"; // oklch(0.962 0.012 85)
-const CORNER_RATIO = 0.1875; // ~iOS-style rounded square
-const LETTER_RATIO = 0.84; // M fills most of the square, with a small margin
 
 async function ensureFont() {
   if (fs.existsSync(FONT_PATH)) return;
@@ -22,28 +20,23 @@ async function ensureFont() {
   fs.writeFileSync(FONT_PATH, Buffer.from(await res.arrayBuffer()));
 }
 
-function buildSvgMarkup(size, { embedFont = true } = {}) {
-  const radius = Math.round(size * CORNER_RATIO);
-  const fontSize = Math.round(size * LETTER_RATIO);
+function iconSvg(size, { embedFont = true } = {}) {
+  const radius = Math.round(size * 0.18);
+  const fontSize = Math.round(size * 0.86);
   const letterSpacing = (-0.01 * fontSize).toFixed(1);
-
   const fontFace = embedFont
-    ? `<style>
-      @font-face {
+    ? `@font-face {
         font-family: "Cormorant Garamond";
-        src: url("data:font/truetype;charset=utf-8;base64,${fs
-          .readFileSync(FONT_PATH)
-          .toString("base64")}") format("truetype");
+        src: url("data:font/truetype;charset=utf-8;base64,${fs.readFileSync(FONT_PATH).toString("base64")}") format("truetype");
         font-weight: 500;
         font-style: normal;
-      }
-    </style>`
-    : `<style>
-      @import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;display=swap");
-    </style>`;
+      }`
+    : `@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&display=swap");`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-  <defs>${fontFace}</defs>
+  <defs>
+    <style>${fontFace}</style>
+  </defs>
   <rect width="${size}" height="${size}" rx="${radius}" ry="${radius}" fill="${INK}"/>
   <text
     x="50%"
@@ -66,8 +59,8 @@ async function writePng(svg, outPath, size) {
 async function main() {
   await ensureFont();
 
-  const svg512 = buildSvgMarkup(512, { embedFont: true });
-  const svgPublic = buildSvgMarkup(512, { embedFont: false });
+  const svg512 = iconSvg(512, { embedFont: true });
+  const svgPublic = iconSvg(512, { embedFont: false });
 
   fs.writeFileSync(path.join(PUBLIC, "favicon.svg"), svgPublic);
   await writePng(svg512, path.join(PUBLIC, "icon-512.png"), 512);
