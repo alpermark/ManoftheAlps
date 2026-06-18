@@ -1,0 +1,54 @@
+{
+  "p01.webp": {
+    "title": "Bridge-Framed Skyline",
+    "width": 1024,
+    "height": 768
+  },
+  "p02.webp": {
+    "title": "Seated Figure on Balcony",
+    "width": 1024,
+    "height": 768
+  },
+  "p03.webp": {
+    "title": "White Spiral Ascent",
+    "width": 1024,
+    "height": 768
+  },
+  "p04.webp": {
+    "title": "Bound Hands, Patterned Wall",
+    "width": 1024,
+    "height": 768
+  },
+  "p05.webp": {
+    "title": "NYPD Cluster",
+    "width": 1024,
+    "height": 818,
+    "tone": "bw"
+  },
+  "p06.webp": {
+    "title": "Glass Grid Facade",
+    "width": 768,
+    "height": 1024
+  },
+  "p07.webp": {
+    "title": "Gate of Green Beyond",
+    "width": 752,
+    "height": 1024
+  },
+  "p08.webp": {
+    "title": "Brick Facade, Bare Trees",
+    "width": 1024,
+    "height": 768
+  },
+  "p09.webp": {
+    "title": "Valley Mirror",
+    "width": 1024,
+    "height": 498
+  },
+  "p10.webp": {
+    "title": "Night Dog Walk",
+    "width": 768,
+    "height": 1024,
+    "tone": "bw"
+  }
+}
