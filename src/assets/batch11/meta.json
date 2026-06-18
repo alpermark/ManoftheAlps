@@ -1,0 +1,43 @@
+{
+  "p01.webp": {
+    "title": "Suite Breakfast Hour",
+    "width": 756,
+    "height": 583
+  },
+  "p02.webp": {
+    "title": "Coastal Tower at Dusk",
+    "width": 1024,
+    "height": 720
+  },
+  "p03.webp": {
+    "title": "Macaw on Shoulder",
+    "width": 1024,
+    "height": 1024
+  },
+  "p04.webp": {
+    "title": "House at Forest Edge",
+    "width": 1024,
+    "height": 768
+  },
+  "p05.webp": {
+    "title": "Golden Mist Over Pines",
+    "width": 1024,
+    "height": 768
+  },
+  "p06.webp": {
+    "title": "Barn and Tractor",
+    "width": 1024,
+    "height": 768,
+    "tone": "bw"
+  },
+  "p07.webp": {
+    "title": "Steel Tower, Power Lines",
+    "width": 768,
+    "height": 1024
+  },
+  "p08.webp": {
+    "title": "Gourmet Shop Window",
+    "width": 1024,
+    "height": 768
+  }
+}
