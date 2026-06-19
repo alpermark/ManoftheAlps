@@ -12,7 +12,7 @@ export function SiteHeader() {
           className="nav-label hidden sm:inline-block opacity-80 hover:opacity-100 transition-opacity"
           data-cursor="Home"
         >
-          Man of the Alps
+          Mark Alper
         </Link>
 
         <nav
