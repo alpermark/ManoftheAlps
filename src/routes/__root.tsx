@@ -176,7 +176,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function SiteFooter() {
   return (
     <footer className="site-container py-8 sm:py-10 nav-label flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-border">
-      <span>© {new Date().getFullYear()} Man of the Alps</span>
+      <span>
+        © {new Date().getFullYear()}
+        {"  |  "}
+        MARK ALPER
+        {"  |  "}
+        MAN OF THE ALPS
+      </span>
     </footer>
   );
 }
