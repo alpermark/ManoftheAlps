@@ -6,16 +6,17 @@ import { Lightbox } from "@/components/Lightbox";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Man of the Alps - Gallery" },
+      { title: "Mark Alper | Man of the Alps" },
       {
         name: "description",
         content:
-          "An ongoing archive of photographs from cities, roads, and people - kept and added to slowly.",
+          "Travel photography by Mark Alper, Man of the Alps. An ongoing archive of images from cities, roads, nature, and the strangers that move between them—kept and added to slowly.",
       },
-      { property: "og:title", content: "Man of the Alps - Gallery" },
+      { property: "og:title", content: "Mark Alper | Man of the Alps" },
       {
         property: "og:description",
-        content: "Photographs from cities, roads, and the people in between.",
+        content:
+          "Travel photography by Mark Alper, Man of the Alps. An ongoing archive of images from cities, roads, nature, and the strangers that move between them—kept and added to slowly.",
       },
     ],
   }),

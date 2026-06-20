@@ -20,11 +20,10 @@ const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(
 const OG_IMAGE = SITE_URL ? `${SITE_URL}/og-image.png` : "/og-image.png";
 const OG_URL = SITE_URL || undefined;
 
-const SITE_TITLE = "Man of the Alps - Photography";
+const SITE_TITLE = "Mark Alper | Man of the Alps";
 const SITE_DESCRIPTION =
-  "Travel photography by Man of the Alps. Cities, people, and moments collected on the road.";
-const OG_DESCRIPTION =
-  "Travel photography - cities, people, and moments collected on the road.";
+  "Travel photography by Mark Alper, Man of the Alps. An ongoing archive of images from cities, roads, nature, and the strangers that move between them—kept and added to slowly.";
+const OG_DESCRIPTION = SITE_DESCRIPTION;
 
 function NotFoundComponent() {
   return (
@@ -95,7 +94,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "description",
           content: SITE_DESCRIPTION,
         },
-        { name: "author", content: "Man of the Alps" },
+        { name: "author", content: "Mark Alper" },
         { property: "og:title", content: SITE_TITLE },
         {
           property: "og:description",
@@ -108,12 +107,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         { property: "og:image:type", content: "image/png" },
         { property: "og:image:width", content: "1200" },
         { property: "og:image:height", content: "1200" },
-        { property: "og:image:alt", content: "Man of the Alps" },
+        { property: "og:image:alt", content: "Mark Alper | Man of the Alps" },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:title", content: SITE_TITLE },
         { name: "twitter:description", content: OG_DESCRIPTION },
         { name: "twitter:image", content: OG_IMAGE },
-        { name: "twitter:image:alt", content: "Man of the Alps" },
+        { name: "twitter:image:alt", content: "Mark Alper | Man of the Alps" },
         { name: "theme-color", content: "#26221f" },
         { name: "apple-mobile-web-app-title", content: "Man of the Alps" },
         { name: "apple-mobile-web-app-capable", content: "yes" },
