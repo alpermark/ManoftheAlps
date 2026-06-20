@@ -34,5 +34,40 @@
     "title": "Gourmet Shop Window",
     "width": 1024,
     "height": 768
+  },
+  "p09.webp": {
+    "title": "Crescent Over Roofline",
+    "width": 768,
+    "height": 1024
+  },
+  "p10.webp": {
+    "title": "Red Balcony Portrait",
+    "subject": "Portraits",
+    "width": 1024,
+    "height": 1024
+  },
+  "p11.webp": {
+    "title": "Whisper at the Machine",
+    "subject": "Portraits",
+    "width": 679,
+    "height": 1024
+  },
+  "p12.webp": {
+    "title": "Hand to Temple",
+    "subject": "Portraits",
+    "width": 1024,
+    "height": 1024
+  },
+  "p13.webp": {
+    "title": "Mirror and Red Flower",
+    "subject": "Portraits",
+    "width": 1024,
+    "height": 1024
+  },
+  "p14.webp": {
+    "title": "Reach Through the Roast",
+    "subject": "Portraits",
+    "width": 1024,
+    "height": 1024
   }
 }
